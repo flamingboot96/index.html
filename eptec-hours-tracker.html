@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eptec Hours Tracker</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f4f8; color: #1a1a1a; min-height: 100vh; }
+
+        .header { background: #0f2d52; color: white; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header-left h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+        .header-left p { font-size: 0.8rem; opacity: 0.6; margin-top: 2px; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+        /* Settings Bar */
+        .settings-bar { background: white; border-radius: 10px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 20px; display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; border-left: 4px solid #0f2d52; }
+        .settings-bar-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #0f2d52; width: 100%; margin-bottom: -8px; }
+        .toggle-wrap { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+        .toggle-wrap label { font-size: 0.8rem; font-weight: 600; color: #555; cursor: pointer; user-select: none; }
+        .toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #ccc; border-radius: 22px; transition: 0.2s; }
+        .toggle-slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+        input:checked + .toggle-slider { background: #0f2d52; }
+        input:checked + .toggle-slider:before { transform: translateX(18px); }
+        .earnings-col { transition: opacity 0.2s; }
+        .hidden-earnings .earnings-col { display: none; }
+
+        /* Cards */
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+        .card { background: white; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+        .card .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #888; margin-bottom: 8px; }
+        .card .value { font-size: 2rem; font-weight: 800; color: #0f2d52; line-height: 1; }
+        .card .sub { font-size: 0.78rem; color: #999; margin-top: 5px; }
+        .card.warn .value { color: #c0392b; }
+        .card.good .value { color: #1a7a4a; }
+        .card.warn { border-top: 3px solid #e74c3c; }
+        .card.good { border-top: 3px solid #27ae60; }
+
+        /* Form */
+        .panel { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); margin-bottom: 20px; }
+        .panel h2 { font-size: 0.95rem; font-weight: 700; color: #0f2d52; margin-bottom: 14px; }
+        .form-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .fg { display: flex; flex-direction: column; gap: 4px; }
+        .fg label { font-size: 0.75rem; font-weight: 600; color: #555; }
+        .fg input, .fg select { border: 1.5px solid #ddd; border-radius: 7px; padding: 8px 11px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.15s; }
+        .fg input:focus, .fg select:focus { border-color: #0f2d52; }
+        .fg.grow { flex: 1; min-width: 180px; }
+        .fg-note { font-size: 0.72rem; color: #aaa; margin-top: 2px; }
+
+        /* Buttons */
+        .btn { padding: 9px 18px; border-radius: 7px; font-size: 0.875rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; }
+        .btn-primary { background: #0f2d52; color: white; }
+        .btn-primary:hover { background: #0a2140; }
+        .btn-secondary { background: #f0f0f0; color: #444; }
+        .btn-secondary:hover { background: #e4e4e4; }
+        .btn-danger { background: #fde8e8; color: #c0392b; }
+        .btn-danger:hover { background: #fbd0d0; }
+        .btn-sm { padding: 5px 11px; font-size: 0.78rem; }
+        .btn-cancel { background: #fff3e0; color: #c0392b; border: 1.5px solid #f5c6a0; }
+        .btn-cancel:hover { background: #ffe8c0; }
+
+        /* Table */
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .table-header h2 { font-size: 0.95rem; font-weight: 700; color: #0f2d52; }
+        .table-header span { font-size: 0.78rem; color: #aaa; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 9px 12px; background: #f7f9fc; color: #666; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #eee; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f2f2f2; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #fafbfd; }
+        .ot-row td { background: #fff9f9; }
+        .ot-row:hover td { background: #fff3f3; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .badge-ot { background: #fde8e8; color: #c0392b; }
+        .badge-ok { background: #e8f8ee; color: #1a7a4a; }
+        .badge-under { background: #fff3e0; color: #b7600a; }
+
+        .text-red { color: #c0392b; font-weight: 700; }
+        .text-green { color: #1a7a4a; }
+        .text-muted { color: #aaa; }
+        .actions { display: flex; gap: 6px; }
+        .empty { text-align: center; padding: 36px; color: #bbb; font-size: 0.875rem; }
+        .divider { height: 1px; background: #f0f0f0; margin: 8px 0; }
+
+        /* Edit mode indicator */
+        .edit-mode-banner { background: #fff3e0; border: 1.5px solid #f5c6a0; border-radius: 8px; padding: 8px 14px; margin-bottom: 12px; font-size: 0.85rem; color: #b7600a; font-weight: 600; display: none; }
+        .edit-mode-banner.show { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <h1>⏱ Eptec Hours Tracker</h1>
+        <p>Actual hours vs 38h contract · Weekly &amp; yearly overtime</p>
+    </div>
+    <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" onclick="showImport()">Import from Claude</button>
+        <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div id="import-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center">
+    <div style="background:white;border-radius:12px;padding:28px;width:520px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+        <h2 style="font-size:1rem;font-weight:700;color:#0f2d52;margin-bottom:6px">Import Hours from Claude</h2>
+        <p style="font-size:0.82rem;color:#777;margin-bottom:14px">Paste the JSON snippet Claude gave you below, then click Import.</p>
+        <textarea id="import-json" rows="8" style="width:100%;border:1.5px solid #ddd;border-radius:7px;padding:10px;font-family:monospace;font-size:0.8rem;resize:vertical;outline:none" placeholder='[{"date":"2026-04-07","project":"DCE","hours":8.5}, ...]'></textarea>
+        <div id="import-error" style="color:#c0392b;font-size:0.8rem;margin-top:8px;display:none"></div>
+        <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end">
+            <button class="btn btn-secondary" onclick="hideImport()">Cancel</button>
+            <button class="btn btn-primary" onclick="doImport()">Import Entries</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Settings -->
+    <div class="settings-bar">
+        <div class="settings-bar-label">Settings</div>
+        <div class="fg">
+            <label>Contract Hours / Week</label>
+            <input type="number" id="contractHours" value="38" min="1" max="80" step="0.5" style="width:110px" oninput="saveSettings(); renderAll()">
+        </div>
+        <div id="salary-fields" style="display:flex;gap:20px;align-items:flex-end">
+            <div class="fg">
+                <label>Annual Salary ($)</label>
+                <input type="number" id="annualSalary" placeholder="e.g. 97,500" style="width:150px" oninput="onSalaryInput(); saveSettings(); renderAll()">
+                <div class="fg-note">Divides by 52 for weekly rate</div>
+            </div>
+            <div class="fg">
+                <label>— or — Hourly Rate ($)</label>
+                <input type="number" id="hourlyRate" placeholder="e.g. 49.30" style="width:140px" oninput="onHourlyInput(); saveSettings(); renderAll()">
+            </div>
+        </div>
+        <div class="toggle-wrap">
+            <label for="showEarnings">Show earnings</label>
+            <label class="toggle">
+                <input type="checkbox" id="showEarnings" checked oninput="saveSettings(); applyEarningsToggle()">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="cards">
+        <div class="card">
+            <div class="label">This Week (Weekdays)</div>
+            <div class="value" id="c-this-week">0h</div>
+            <div class="sub" id="c-this-week-sub">of 38h contracted</div>
+        </div>
+
+        <div class="card warn">
+            <div class="label">Weekend Hours YTD</div>
+            <div class="value" id="c-weekend-year">0h</div>
+            <div class="sub" id="c-weekend-year-sub">fully unpaid</div>
+        </div>
+        <div class="card warn">
+            <div class="label">Total Unpaid Hours YTD</div>
+            <div class="value" id="c-ot-year">0h</div>
+            <div class="sub" id="c-ot-year-sub">weekday OT + weekends</div>
+        </div>
+        <div class="card good earnings-col" id="card-unpaid" style="grid-column: span 1">
+            <div class="label">YTD Unpaid Value</div>
+            <div class="value" id="c-unpaid">—</div>
+            <div class="sub" id="c-unpaid-sub">add salary to calculate</div>
+        </div>
+        <div class="card earnings-col" id="card-eff-rate">
+            <div class="label">Effective Rate (YTD)</div>
+            <div class="value" id="c-eff-rate">—</div>
+            <div class="sub" id="c-eff-rate-sub">add salary to calculate</div>
+        </div>
+    </div>
+
+    <!-- Log Entry Form -->
+    <div class="panel">
+        <h2 id="form-title">Log Hours</h2>
+        <div class="edit-mode-banner" id="edit-banner">✏️ Editing entry — make changes and click Update Entry</div>
+        <div class="form-row">
+            <div class="fg">
+                <label>Date</label>
+                <input type="date" id="entryDate" style="width:160px">
+            </div>
+            <div class="fg grow">
+                <label>Project / Task</label>
+                <input type="text" id="entryProject" placeholder="e.g. Site inspection, Report writing, Travel..." onkeydown="if(event.key==='Enter') addEntry()">
+            </div>
+            <div class="fg">
+                <label>Hours</label>
+                <input type="number" id="entryHours" placeholder="8" min="0.25" max="24" step="0.25" style="width:90px" onkeydown="if(event.key==='Enter') addEntry()">
+            </div>
+            <button class="btn btn-primary" id="submit-btn" onclick="addEntry()">Add Entry</button>
+            <button class="btn btn-cancel" id="cancel-btn" onclick="cancelEdit()" style="display:none">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Week Projection -->
+    <div class="panel" id="projection-panel">
+        <h2 style="font-size:0.95rem;font-weight:700;color:#0f2d52;margin-bottom:14px">📈 Week Projection</h2>
+        <div id="projection-content"></div>
+    </div>
+
+    <!-- Weekly Breakdown -->
+    <div class="panel">
+        <div class="table-header">
+            <h2>Weekly Breakdown</h2>
+            <span id="week-count"></span>
+        </div>
+        <div id="weekly-table"><div class="empty">Log some hours to see your weekly breakdown.</div></div>
+    </div>
+
+    <!-- All Entries -->
+    <div class="panel">
+        <div class="table-header">
+            <h2>All Entries</h2>
+            <span id="entry-count"></span>
+        </div>
+        <div id="entries-table"><div class="empty">No entries yet. Start by logging your hours above.</div></div>
+    </div>
+
+</div>
+
+<script>
+    // ── Pending entries (added by Claude directly) ─────────────────────────────
+    const PENDING_ENTRIES = [
+      {"date":"2026-05-15","project":"DCE","hours":6},
+      {"date":"2026-05-18","project":"DCE","hours":6.75},
+      {"date":"2026-05-19","project":"DCE","hours":9.5},
+      {"date":"2026-05-20","project":"DCE","hours":9.5},
+      {"date":"2026-05-21","project":"DCE","hours":9},
+      {"date":"2026-05-22","project":"DCE","hours":6.5},
+      // Week of 25 May 2026
+      {"date":"2026-05-25","project":"DCE","hours":7.5},   // 0800–1600, –30min lunch
+      {"date":"2026-05-26","project":"DCE","hours":9.25},  // 0600–1545, –30min lunch
+      {"date":"2026-05-27","project":"DCE","hours":9},     // 0600–1530, –30min lunch
+      {"date":"2026-05-28","project":"DCE","hours":8.5},   // 0600–1500, –30min lunch
+      // 29 May 2026: start 0600, end TBC (still working) — add hours manually once finished
+    ];
+
+    // ── State ──────────────────────────────────────────────────────────────────
+    let entries  = JSON.parse(localStorage.getItem('eptec_v2_entries')  || '[]');
+    let settings = JSON.parse(localStorage.getItem('eptec_v2_settings') || '{}');
+    let planned  = JSON.parse(localStorage.getItem('eptec_v2_planned')  || '{}');
+    let editingId = null;
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    function init() {
+        // Auto-import any pending entries Claude has added
+        if (PENDING_ENTRIES.length > 0) {
+            const existing = new Set(entries.map(e => `${e.date}|${e.project}|${e.hours}`));
+            const toAdd = PENDING_ENTRIES.filter(e => !existing.has(`${e.date}|${e.project}|${e.hours}`));
+            if (toAdd.length > 0) {
+                toAdd.forEach(e => entries.push({
+                    id: Date.now().toString() + Math.random().toString(36).slice(2),
+                    date: e.date, project: e.project, hours: e.hours
+                }));
+                saveEntries();
+            }
+        }
+
+        document.getElementById('entryDate').value = todayStr();
+        if (settings.contractHours != null) document.getElementById('contractHours').value = settings.contractHours;
+        if (settings.annualSalary)  document.getElementById('annualSalary').value = settings.annualSalary;
+        if (settings.hourlyRate)    document.getElementById('hourlyRate').value = settings.hourlyRate;
+        if (settings.showEarnings === false) document.getElementById('showEarnings').checked = false;
+        applyEarningsToggle();
+        renderAll();
+    }
+
+    // ── Settings ──────────────────────────────────────────────────────────────
+    function saveSettings() {
+        settings.contractHours = parseFloat(document.getElementById('contractHours').value) || 38;
+        settings.annualSalary  = parseFloat(document.getElementById('annualSalary').value)  || null;
+        settings.hourlyRate    = parseFloat(document.getElementById('hourlyRate').value)    || null;
+        settings.showEarnings  = document.getElementById('showEarnings').checked;
+        localStorage.setItem('eptec_v2_settings', JSON.stringify(settings));
+    }
+
+    function applyEarningsToggle() {
+        const show = document.getElementById('showEarnings').checked;
+        document.querySelectorAll('.earnings-col').forEach(el => {
+            el.style.display = show ? '' : 'none';
+        });
+        document.getElementById('salary-fields').style.display = show ? '' : 'none';
+        renderProjection();
+    }
+
+    function onSalaryInput() {
+        if (document.getElementById('annualSalary').value) {
+            document.getElementById('hourlyRate').value = '';
+        }
+    }
+    function onHourlyInput() {
+        if (document.getElementById('hourlyRate').value) {
+            document.getElementById('annualSalary').value = '';
+        }
+    }
+
+    function getContractHours() {
+        return parseFloat(document.getElementById('contractHours').value) || 38;
+    }
+
+    function getHourlyRate() {
+        const h = parseFloat(document.getElementById('hourlyRate').value);
+        const a = parseFloat(document.getElementById('annualSalary').value);
+        if (h)  return h;
+        if (a)  return a / 52 / getContractHours();
+        return null;
+    }
+
+    function getWeeklySalary() {
+        const h = parseFloat(document.getElementById('hourlyRate').value);
+        const a = parseFloat(document.getElementById('annualSalary').value);
+        if (a)  return a / 52;
+        if (h)  return h * getContractHours();
+        return null;
+    }
+
+    // ── Date Helpers ──────────────────────────────────────────────────────────
+    function todayStr() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function getWeekKey(dateStr) {
+        const d = new Date(dateStr + 'T12:00:00');
+        const day = d.getDay(); // 0=Sun
+        const offset = day === 0 ? -6 : 1 - day; // shift to Monday
+        const mon = new Date(d);
+        mon.setDate(d.getDate() + offset);
+        return `${mon.getFullYear()}-${String(mon.getMonth()+1).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`;
+    }
+
+    function getWeekLabel(wkKey) {
+        const mon = new Date(wkKey + 'T12:00:00');
+        const sun = new Date(mon);
+        sun.setDate(mon.getDate() + 6);
+        const opts = { day: 'numeric', month: 'short' };
+        return `${mon.toLocaleDateString('en-AU', opts)} – ${sun.toLocaleDateString('en-AU', opts, { year: 'numeric' })}`;
+    }
+
+    function getCurrentWeekKey() { return getWeekKey(todayStr()); }
+    function getCurrentYear()    { return new Date().getFullYear(); }
+
+    function fmtDate(dateStr) {
+        const d = new Date(dateStr + 'T12:00:00');
+        return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    // ── Entries CRUD ──────────────────────────────────────────────────────────
+    function saveEntries() {
+        localStorage.setItem('eptec_v2_entries', JSON.stringify(entries));
+    }
+
+    function addEntry() {
+        const date    = document.getElementById('entryDate').value;
+        const project = document.getElementById('entryProject').value.trim() || 'General';
+        const hours   = parseFloat(document.getElementById('entryHours').value);
+
+        if (!date)           { alert('Please enter a date.');         return; }
+        if (!hours || hours <= 0) { alert('Please enter valid hours.'); return; }
+
+        if (editingId) {
+            const idx = entries.findIndex(e => e.id === editingId);
+            if (idx !== -1) entries[idx] = { ...entries[idx], date, project, hours };
+            cancelEdit();
+        } else {
+            entries.push({ id: Date.now().toString(), date, project, hours });
+            document.getElementById('entryProject').value = '';
+            document.getElementById('entryHours').value = '';
+        }
+
+        saveEntries();
+        renderAll();
+    }
+
+    function editEntry(id) {
+        const e = entries.find(e => e.id === id);
+        if (!e) return;
+        editingId = id;
+        document.getElementById('entryDate').value    = e.date;
+        document.getElementById('entryProject').value = e.project;
+        document.getElementById('entryHours').value   = e.hours;
+        document.getElementById('submit-btn').textContent = 'Update Entry';
+        document.getElementById('cancel-btn').style.display = '';
+        document.getElementById('edit-banner').classList.add('show');
+        document.getElementById('entryDate').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function cancelEdit() {
+        editingId = null;
+        document.getElementById('entryDate').value    = todayStr();
+        document.getElementById('entryProject').value = '';
+        document.getElementById('entryHours').value   = '';
+        document.getElementById('submit-btn').textContent = 'Add Entry';
+        document.getElementById('cancel-btn').style.display = 'none';
+        document.getElementById('edit-banner').classList.remove('show');
+    }
+
+    function deleteEntry(id) {
+        if (!confirm('Delete this entry?')) return;
+        entries = entries.filter(e => e.id !== id);
+        saveEntries();
+        renderAll();
+    }
+
+    // ── Group Helpers ─────────────────────────────────────────────────────────
+    function groupByWeek(list) {
+        const wks = {};
+        list.forEach(e => {
+            const k = getWeekKey(e.date);
+            if (!wks[k]) wks[k] = [];
+            wks[k].push(e);
+        });
+        return wks;
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────
+    function renderAll() {
+        renderCards();
+        renderProjection();
+        renderWeekly();
+        renderEntries();
+        applyEarningsToggle();
+    }
+
+    function updatePlanned(date, val) {
+        const hrs = parseFloat(val);
+        if (!isNaN(hrs) && hrs >= 0) planned[date] = hrs;
+        else delete planned[date];
+        localStorage.setItem('eptec_v2_planned', JSON.stringify(planned));
+        renderProjection();
+        applyEarningsToggle();
+    }
+
+    function renderProjection() {
+        const contract  = getContractHours();
+        const hourly    = getHourlyRate();
+        const curWk     = getCurrentWeekKey();
+        const today     = todayStr();
+        const todayDate = new Date(today + 'T12:00:00');
+        const todayDay  = todayDate.getDay(); // 0=Sun,6=Sat
+
+        // Hours logged this week (weekdays only)
+        const wkEntries   = entries.filter(e => getWeekKey(e.date) === curWk);
+        const wkWdHrs     = wkEntries.filter(e => !isWeekend(e.date)).reduce((s, e) => s + e.hours, 0);
+        const loggedToday = wkEntries.filter(e => e.date === today).reduce((s, e) => s + e.hours, 0);
+
+        // Historical average (excluding today if partially logged)
+        const histEntries = entries.filter(e => !isWeekend(e.date) && e.date !== today);
+        const histDays    = new Set(histEntries.map(e => e.date)).size;
+        const histHrs     = histEntries.reduce((s, e) => s + e.hours, 0);
+        const avgDayHrs   = histDays > 0 ? histHrs / histDays : 8;
+
+        // Build remaining weekday dates for this week
+        const remainingDates = [];
+        for (let offset = 1; offset <= 7; offset++) {
+            const d = new Date(todayDate);
+            d.setDate(todayDate.getDate() + offset);
+            const day = d.getDay();
+            if (day >= 1 && day <= 5) {
+                const dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                if (getWeekKey(dStr) === curWk) remainingDates.push(dStr);
+            }
+        }
+        // Include today if it's a weekday and not fully logged
+        const includeToday = todayDay >= 1 && todayDay <= 5 && loggedToday === 0;
+        if (includeToday) remainingDates.unshift(today);
+
+        // Projected remaining hours using planned overrides or avg
+        const remainingHrs = remainingDates.reduce((s, d) => {
+            return s + (planned[d] !== undefined ? planned[d] : avgDayHrs);
+        }, 0);
+
+        const projectedTotal  = wkWdHrs + remainingHrs;
+        const projectedOT     = Math.max(0, projectedTotal - contract);
+        const projectedUnder  = Math.max(0, contract - projectedTotal);
+        const projectedUnpaid   = hourly ? projectedOT * hourly : null;
+        const projEffRate       = (hourly && projectedTotal > 0) ? (hourly * contract) / projectedTotal : null;
+        const showEarnings      = document.getElementById('showEarnings').checked;
+        const otColour          = projectedOT > 0.001 ? '#c0392b' : '#1a7a4a';
+
+        const otLabel = projectedOT > 0.001
+            ? `<span style="color:#c0392b;font-weight:700">+${projectedOT.toFixed(1)}h overtime</span>`
+            : projectedUnder > 0.001
+            ? `<span style="color:#b7600a;font-weight:700">−${projectedUnder.toFixed(1)}h under</span>`
+            : `<span style="color:#1a7a4a;font-weight:700">Exactly on contract ✓</span>`;
+
+        const barMax = Math.max(contract * 1.4, projectedTotal + 2);
+        const wkPct  = Math.min(100, (wkWdHrs / barMax) * 100);
+        const prPct  = Math.min(100, (projectedTotal / barMax) * 100);
+        const ctPct  = Math.min(100, (contract / barMax) * 100);
+
+        const el = document.getElementById('projection-content');
+        if (entries.length === 0) {
+            el.innerHTML = '<div class="empty">Log some hours to see your week projection.</div>';
+            return;
+        }
+
+        // Build per-day plan rows
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        let dayRows = remainingDates.map(d => {
+            const dt       = new Date(d + 'T12:00:00');
+            const label    = `${dayNames[dt.getDay()]} ${dt.getDate()} ${monthNames[dt.getMonth()]}`;
+            const val      = planned[d] !== undefined ? planned[d] : '';
+            const isCustom = planned[d] !== undefined;
+            const dispHrs  = planned[d] !== undefined ? planned[d] : avgDayHrs;
+            const otHrs    = Math.max(0, wkWdHrs + dispHrs - contract);
+            return `
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">${label}</div>
+                <input type="number" min="0" max="24" step="0.25"
+                    value="${val}"
+                    placeholder="${avgDayHrs.toFixed(1)} (avg)"
+                    style="width:110px;border:1.5px solid ${isCustom ? '#0f2d52' : '#ddd'};border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none"
+                    oninput="updatePlanned('${d}', this.value)"
+                    onfocus="this.style.borderColor='#0f2d52'"
+                    onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999">${isCustom ? `<span style="color:#0f2d52;font-weight:600">${dispHrs}h planned</span>` : `avg ${avgDayHrs.toFixed(1)}h`}</div>
+                ${isCustom ? `<button onclick="updatePlanned('${d}', '')" style="font-size:0.72rem;color:#aaa;background:none;border:none;cursor:pointer;padding:2px 6px">✕ reset</button>` : ''}
+            </div>`;
+        }).join('');
+
+        if (remainingDates.length === 0) {
+            dayRows = `<div style="font-size:0.82rem;color:#aaa;padding:8px 0">No weekdays remaining this week.</div>`;
+        }
+
+        el.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr ${showEarnings && hourly ? '1fr 1fr' : ''};gap:12px;margin-bottom:18px">
+            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Logged This Week</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">${wkWdHrs.toFixed(1)}h</div>
+                <div style="font-size:0.78rem;color:#999;margin-top:3px">of ${contract}h contract</div>
+            </div>
+            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid ${otColour}">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Projected Week Total</div>
+                <div style="font-size:1.6rem;font-weight:800;color:${otColour}">${projectedTotal.toFixed(1)}h</div>
+                <div style="font-size:0.78rem;margin-top:3px">${otLabel}</div>
+            </div>
+            ${hourly && showEarnings ? `
+            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid ${projectedOT > 0 ? '#c0392b' : '#ccc'}">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Projected Unpaid Value</div>
+                <div style="font-size:1.6rem;font-weight:800;color:${projectedOT > 0 ? '#c0392b' : '#1a7a4a'}">${projectedOT > 0 ? '$' + Math.round(projectedUnpaid).toLocaleString() : '$0'}</div>
+                <div style="font-size:0.78rem;color:#999;margin-top:3px">this week</div>
+            </div>
+            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid ${projEffRate !== null && projEffRate < hourly - 0.01 ? '#c0392b' : '#27ae60'}">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Effective Rate (This Week)</div>
+                <div style="font-size:1.6rem;font-weight:800;color:${projEffRate !== null && projEffRate < hourly - 0.01 ? '#c0392b' : '#1a7a4a'}">${projEffRate !== null ? '$' + projEffRate.toFixed(2) + '/h' : '—'}</div>
+                <div style="font-size:0.78rem;color:#999;margin-top:3px">vs $${hourly ? hourly.toFixed(2) : '—'}/h contracted</div>
+            </div>` : ''}
+        </div>
+
+        <!-- Progress bar -->
+        <div style="margin-bottom:18px">
+            <div style="position:relative;height:28px;background:#f0f0f0;border-radius:14px;overflow:hidden">
+                <div style="position:absolute;left:0;top:0;height:100%;width:${prPct}%;background:#fca5a5;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:${wkPct}%;background:#0f2d52;border-radius:14px"></div>
+                <div style="position:absolute;left:${ctPct}%;top:0;height:100%;width:2px;background:#f59e0b;z-index:2"></div>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:7px;font-size:0.75rem;color:#888;flex-wrap:wrap">
+                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged ${wkWdHrs.toFixed(1)}h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected ${projectedTotal.toFixed(1)}h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>Contract ${contract}h</span>
+            </div>
+        </div>
+
+        <!-- Per-day plan -->
+        ${remainingDates.length > 0 ? `
+        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#888;margin-bottom:4px">
+            Plan remaining days <span style="font-weight:400;text-transform:none;letter-spacing:0">(override the average for any day)</span>
+        </div>
+        ${dayRows}` : dayRows}`;
+    }
+
+    function isWeekend(dateStr) {
+        const day = new Date(dateStr + 'T12:00:00').getDay(); // 0=Sun, 6=Sat
+        return day === 0 || day === 6;
+    }
+
+    function renderCards() {
+        const contract = getContractHours();
+        const hourly   = getHourlyRate();
+        const curWk    = getCurrentWeekKey();
+        const curYr    = getCurrentYear();
+
+        // This week — weekday hours and OT only
+        const wkEntries     = entries.filter(e => getWeekKey(e.date) === curWk);
+        const wkWeekday     = wkEntries.filter(e => !isWeekend(e.date)).reduce((s, e) => s + e.hours, 0);
+        const wkOT          = Math.max(0, wkWeekday - contract);
+
+        // YTD
+        const yrEntries     = entries.filter(e => new Date(e.date + 'T12:00:00').getFullYear() === curYr);
+        const yrByWeek      = groupByWeek(yrEntries);
+
+        // Weekday OT per week
+        const yrWeekdayOT   = Object.values(yrByWeek).reduce((s, wk) => {
+            const wdHrs = wk.filter(e => !isWeekend(e.date)).reduce((a, e) => a + e.hours, 0);
+            return s + Math.max(0, wdHrs - contract);
+        }, 0);
+
+        // Weekend hours YTD
+        const yrWeekendHrs  = yrEntries.filter(e => isWeekend(e.date)).reduce((s, e) => s + e.hours, 0);
+
+        const totalUnpaidHrs = yrWeekdayOT + yrWeekendHrs;
+        const ytdValue       = hourly ? totalUnpaidHrs * hourly : null;
+
+        // Effective rate YTD: contracted weekly pay × weeks / total hours worked
+        const yrTotalHrs  = yrEntries.reduce((s, e) => s + e.hours, 0);
+        const yrWeeks     = Object.keys(yrByWeek).length;
+        const ytdEffRate  = (hourly && yrWeeks > 0 && yrTotalHrs > 0)
+            ? (hourly * contract * yrWeeks) / yrTotalHrs
+            : null;
+
+        document.getElementById('c-this-week').textContent        = `${wkWeekday.toFixed(1)}h`;
+        document.getElementById('c-this-week-sub').textContent     = `of ${contract}h contracted`;
+
+        document.getElementById('c-weekend-year').textContent     = `${yrWeekendHrs.toFixed(1)}h`;
+        document.getElementById('c-weekend-year-sub').textContent  = `in ${curYr}`;
+        document.getElementById('c-ot-year').textContent          = `${totalUnpaidHrs.toFixed(1)}h`;
+        document.getElementById('c-ot-year-sub').textContent       = `${yrWeekdayOT.toFixed(1)}h OT + ${yrWeekendHrs.toFixed(1)}h weekends`;
+        document.getElementById('c-unpaid').textContent           = ytdValue !== null ? `$${Math.round(ytdValue).toLocaleString()}` : '—';
+        document.getElementById('c-unpaid-sub').textContent       = ytdValue !== null
+            ? `at $${hourly.toFixed(2)}/h contracted rate`
+            : 'add salary to calculate';
+
+        const effRateEl    = document.getElementById('c-eff-rate');
+        const effRateCard  = document.getElementById('card-eff-rate');
+        if (ytdEffRate !== null) {
+            effRateEl.textContent = `$${ytdEffRate.toFixed(2)}/h`;
+            effRateEl.style.color = ytdEffRate < hourly - 0.01 ? '#c0392b' : '#1a7a4a';
+            effRateCard.className = ytdEffRate < hourly - 0.01 ? 'card warn earnings-col' : 'card good earnings-col';
+            document.getElementById('c-eff-rate-sub').textContent = `vs $${hourly.toFixed(2)}/h contracted`;
+        } else {
+            effRateEl.textContent = '—';
+            effRateEl.style.color = '';
+            effRateCard.className = 'card earnings-col';
+            document.getElementById('c-eff-rate-sub').textContent = 'add salary to calculate';
+        }
+    }
+
+    function renderWeekly() {
+        const contract  = getContractHours();
+        const hourly    = getHourlyRate();
+        const wksByKey  = groupByWeek(entries);
+        const wkKeys    = Object.keys(wksByKey).sort().reverse();
+
+        document.getElementById('week-count').textContent = `${wkKeys.length} week${wkKeys.length !== 1 ? 's' : ''}`;
+
+        if (wkKeys.length === 0) {
+            document.getElementById('weekly-table').innerHTML = '<div class="empty">No data yet.</div>';
+            return;
+        }
+
+        let html = `<table>
+            <thead><tr>
+                <th>Week</th>
+                <th>Weekday Hrs</th>
+                <th>Weekend Hrs</th>
+                <th>Contract</th>
+                <th>Weekday OT</th>
+                <th>Total Unpaid Hrs</th>
+                <th class="earnings-col">Effective Rate</th>
+                <th class="earnings-col">Unpaid Value</th>
+            </tr></thead><tbody>`;
+
+        wkKeys.forEach(wk => {
+            const wkList      = wksByKey[wk];
+            const wdEntries   = wkList.filter(e => !isWeekend(e.date));
+            const weEntries   = wkList.filter(e => isWeekend(e.date));
+            const wdHrs       = wdEntries.reduce((s, e) => s + e.hours, 0);
+            const weHrs       = weEntries.reduce((s, e) => s + e.hours, 0);
+            const totalHrs    = wdHrs + weHrs;
+            const wdOT        = Math.max(0, wdHrs - contract);
+            const wdUnder     = Math.max(0, contract - wdHrs);
+            const totalUnpaid = wdOT + weHrs;
+            const days        = new Set(wkList.map(e => e.date)).size;
+
+            // Effective rate: weekly salary / total hours worked (incl. weekends)
+            const effRate     = hourly && totalHrs > 0 ? (hourly * contract) / totalHrs : null;
+            const unpaidVal   = hourly ? totalUnpaid * hourly : null;
+            const hasIssue    = wdOT > 0.001 || weHrs > 0.001;
+
+            let otBadge = '';
+            if (wdOT > 0.001)        otBadge = `<span class="badge badge-ot">+${wdOT.toFixed(1)}h</span>`;
+            else if (wdUnder > 0.001) otBadge = `<span class="badge badge-under">−${wdUnder.toFixed(1)}h</span>`;
+            else                      otBadge = `<span class="badge badge-ok">On contract</span>`;
+
+            let weBadge = weHrs > 0.001
+                ? `<span class="badge badge-ot">${weHrs.toFixed(1)}h</span>`
+                : `<span class="text-muted">—</span>`;
+
+            let effRateHtml = '—';
+            if (effRate !== null) {
+                const cls = effRate < hourly - 0.01 ? 'text-red' : 'text-green';
+                effRateHtml = `<span class="${cls}">$${effRate.toFixed(2)}/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $${hourly.toFixed(2)}</span>`;
+            }
+
+            html += `<tr class="${hasIssue ? 'ot-row' : ''}">
+                <td><strong>${getWeekLabel(wk)}</strong></td>
+                <td><strong>${wdHrs.toFixed(1)}h</strong></td>
+                <td>${weBadge}</td>
+                <td>${contract}h</td>
+                <td>${otBadge}</td>
+                <td>${totalUnpaid > 0.001 ? `<span class="text-red">${totalUnpaid.toFixed(1)}h</span>` : '<span class="text-muted">0h</span>'}</td>
+                <td class="earnings-col">${effRateHtml}</td>
+                <td class="earnings-col">${unpaidVal !== null && totalUnpaid > 0.001 ? `<span class="text-red">$${Math.round(unpaidVal).toLocaleString()}</span>` : unpaidVal !== null ? '<span class="text-muted">$0</span>' : '—'}</td>
+            </tr>`;
+        });
+
+        // All-time totals footer
+        const allWdOT  = Object.values(wksByKey).reduce((s, wk) => {
+            const wdHrs = wk.filter(e => !isWeekend(e.date)).reduce((a, e) => a + e.hours, 0);
+            return s + Math.max(0, wdHrs - contract);
+        }, 0);
+        const allWeHrs  = entries.filter(e => isWeekend(e.date)).reduce((s, e) => s + e.hours, 0);
+        const allWdHrs  = entries.filter(e => !isWeekend(e.date)).reduce((s, e) => s + e.hours, 0);
+        const allUnpaid = allWdOT + allWeHrs;
+        const allVal    = hourly ? allUnpaid * hourly : null;
+
+        html += `</tbody><tfoot>
+            <tr style="background:#f7f9fc;font-weight:700;border-top:2px solid #eee">
+                <td style="color:#555;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">All Time</td>
+                <td>${allWdHrs.toFixed(1)}h</td>
+                <td>${allWeHrs > 0 ? `<span class="text-red">${allWeHrs.toFixed(1)}h</span>` : '—'}</td>
+                <td>—</td>
+                <td><span class="badge badge-ot">${allWdOT.toFixed(1)}h OT</span></td>
+                <td><span class="text-red">${allUnpaid.toFixed(1)}h</span></td>
+                <td class="earnings-col">—</td>
+                <td class="earnings-col">${allVal !== null ? `<span class="text-red">$${Math.round(allVal).toLocaleString()}</span>` : '—'}</td>
+            </tr>
+        </tfoot></table>`;
+
+        document.getElementById('weekly-table').innerHTML = html;
+    }
+
+    function renderEntries() {
+        const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+        document.getElementById('entry-count').textContent = `${sorted.length} entr${sorted.length !== 1 ? 'ies' : 'y'}`;
+
+        if (sorted.length === 0) {
+            document.getElementById('entries-table').innerHTML = '<div class="empty">No entries yet.</div>';
+            return;
+        }
+
+        let html = `<table>
+            <thead><tr>
+                <th>Date</th>
+                <th>Project / Task</th>
+                <th>Hours</th>
+                <th>Week</th>
+                <th style="width:120px"></th>
+            </tr></thead><tbody>`;
+
+        sorted.forEach(e => {
+            const isEditing = e.id === editingId;
+            const weekend   = isWeekend(e.date);
+            html += `<tr${isEditing ? ' style="background:#fff8e1"' : weekend ? ' class="ot-row"' : ''}>
+                <td>${fmtDate(e.date)}${weekend ? ' <span class="badge badge-ot" style="font-size:0.68rem;padding:1px 6px">Weekend</span>' : ''}</td>
+                <td>${e.project}</td>
+                <td>${e.hours}h</td>
+                <td class="text-muted" style="font-size:0.78em">${getWeekLabel(getWeekKey(e.date))}</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('${e.id}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('${e.id}')">Delete</button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+
+        html += '</tbody></table>';
+        document.getElementById('entries-table').innerHTML = html;
+    }
+
+    // ── Export ────────────────────────────────────────────────────────────────
+    function exportCSV() {
+        const contract = getContractHours();
+        const hourly   = getHourlyRate();
+        const sorted   = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+        const byWeek   = groupByWeek(entries);
+
+        let csv = 'Date,Project/Task,Hours,Week,Week Total Hours,Week Overtime,Unpaid Value ($)\n';
+        sorted.forEach(e => {
+            const wk     = getWeekKey(e.date);
+            const wkTot  = byWeek[wk].reduce((s, x) => s + x.hours, 0);
+            const ot     = Math.max(0, wkTot - contract);
+            const unpaid = hourly ? (ot * hourly).toFixed(2) : '';
+            csv += `${e.date},"${e.project.replace(/"/g,'""')}",${e.hours},"${getWeekLabel(wk)}",${wkTot.toFixed(1)},${ot.toFixed(1)},${unpaid}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `eptec-hours-${todayStr()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // ── Import ────────────────────────────────────────────────────────────────
+    function showImport() {
+        document.getElementById('import-overlay').style.display = 'flex';
+        document.getElementById('import-json').value = '';
+        document.getElementById('import-error').style.display = 'none';
+        document.getElementById('import-json').focus();
+    }
+
+    function hideImport() {
+        document.getElementById('import-overlay').style.display = 'none';
+    }
+
+    function doImport() {
+        const raw = document.getElementById('import-json').value.trim();
+        const errEl = document.getElementById('import-error');
+        errEl.style.display = 'none';
+
+        let newEntries;
+        try {
+            newEntries = JSON.parse(raw);
+            if (!Array.isArray(newEntries)) throw new Error('Expected a JSON array.');
+        } catch (e) {
+            errEl.textContent = 'Invalid JSON — make sure you copied the full snippet from Claude.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        // Validate and normalise each entry
+        const valid = [];
+        for (const e of newEntries) {
+            if (!e.date || !e.hours) { continue; }
+            valid.push({
+                id: Date.now().toString() + Math.random().toString(36).slice(2),
+                date: e.date,
+                project: e.project || 'DCE',
+                hours: parseFloat(e.hours)
+            });
+        }
+
+        if (valid.length === 0) {
+            errEl.textContent = 'No valid entries found. Each entry needs at least a date and hours.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        // Merge — skip duplicates (same date + project + hours)
+        const existing = entries.map(e => `${e.date}|${e.project}|${e.hours}`);
+        const toAdd = valid.filter(e => !existing.includes(`${e.date}|${e.project}|${e.hours}`));
+        entries = [...entries, ...toAdd];
+        saveEntries();
+        renderAll();
+        hideImport();
+
+        // Brief confirmation
+        alert(`✅ Imported ${toAdd.length} entr${toAdd.length !== 1 ? 'ies' : 'y'}${valid.length - toAdd.length > 0 ? ` (${valid.length - toAdd.length} skipped as duplicates)` : ''}.`);
+    }
+
+    // Close modal on overlay click
+    document.getElementById('import-overlay').addEventListener('click', function(e) {
+        if (e.target === this) hideImport();
+    });
+
+    // ── Go ────────────────────────────────────────────────────────────────────
+    init();
+</script>
+</body>
+</html>
