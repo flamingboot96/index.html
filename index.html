@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eptec Hours Tracker</title>
@@ -111,7 +110,7 @@
     <div style="background:white;border-radius:12px;padding:28px;width:520px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
         <h2 style="font-size:1rem;font-weight:700;color:#0f2d52;margin-bottom:6px">Import Hours from Claude</h2>
         <p style="font-size:0.82rem;color:#777;margin-bottom:14px">Paste the JSON snippet Claude gave you below, then click Import.</p>
-        <textarea id="import-json" rows="8" style="width:100%;border:1.5px solid #ddd;border-radius:7px;padding:10px;font-family:monospace;font-size:0.8rem;resize:vertical;outline:none" placeholder='[{"date":"2026-04-07","project":"DCE","hours":8.5}, ...]'></textarea>
+        <textarea id="import-json" rows="8" style="width:100%;border:1.5px solid #ddd;border-radius:7px;padding:10px;font-family:monospace;font-size:0.8rem;resize:vertical;outline:none" placeholder="[{&quot;date&quot;:&quot;2026-04-07&quot;,&quot;project&quot;:&quot;DCE&quot;,&quot;hours&quot;:8.5}, ...]"></textarea>
         <div id="import-error" style="color:#c0392b;font-size:0.8rem;margin-top:8px;display:none"></div>
         <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end">
             <button class="btn btn-secondary" onclick="hideImport()">Cancel</button>
@@ -129,7 +128,7 @@
             <label>Contract Hours / Week</label>
             <input type="number" id="contractHours" value="38" min="1" max="80" step="0.5" style="width:110px" oninput="saveSettings(); renderAll()">
         </div>
-        <div id="salary-fields" style="display:flex;gap:20px;align-items:flex-end">
+        <div id="salary-fields" style="display: none; gap: 20px; align-items: flex-end;">
             <div class="fg">
                 <label>Annual Salary ($)</label>
                 <input type="number" id="annualSalary" placeholder="e.g. 97,500" style="width:150px" oninput="onSalaryInput(); saveSettings(); renderAll()">
@@ -143,9 +142,17 @@
         <div class="toggle-wrap">
             <label for="showEarnings">Show earnings</label>
             <label class="toggle">
-                <input type="checkbox" id="showEarnings" checked oninput="saveSettings(); applyEarningsToggle()">
+                <input type="checkbox" id="showEarnings" checked="" oninput="saveSettings(); applyEarningsToggle()">
                 <span class="toggle-slider"></span>
             </label>
+        </div>
+        <div class="fg" style="margin-left:auto;border-left:1px solid #e0e0e0;padding-left:20px">
+            <label>GitHub Token <span style="font-weight:400;color:#aaa;font-size:0.7rem">(stored locally)</span></label>
+            <div style="display:flex;gap:8px;align-items:center">
+                <input type="password" id="ghToken" placeholder="ghp_…" style="width:170px;font-family:monospace;font-size:0.8rem" oninput="saveGhToken()">
+                <button onclick="pushToGitHub()" id="ghPushBtn" style="background:#0f2d52;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap" disabled="">⏳ Pushing…</button>
+            </div>
+            <div id="ghPushStatus" style="font-size:0.72rem;color:#888;margin-top:3px;min-height:1em">Encoding file…</div>
         </div>
     </div>
 
@@ -153,29 +160,29 @@
     <div class="cards">
         <div class="card">
             <div class="label">This Week (Weekdays)</div>
-            <div class="value" id="c-this-week">0h</div>
+            <div class="value" id="c-this-week">0.0h</div>
             <div class="sub" id="c-this-week-sub">of 38h contracted</div>
         </div>
 
         <div class="card warn">
             <div class="label">Weekend Hours YTD</div>
-            <div class="value" id="c-weekend-year">0h</div>
-            <div class="sub" id="c-weekend-year-sub">fully unpaid</div>
+            <div class="value" id="c-weekend-year">6.0h</div>
+            <div class="sub" id="c-weekend-year-sub">in 2026</div>
         </div>
         <div class="card warn">
             <div class="label">Total Unpaid Hours YTD</div>
-            <div class="value" id="c-ot-year">0h</div>
-            <div class="sub" id="c-ot-year-sub">weekday OT + weekends</div>
+            <div class="value" id="c-ot-year">29.5h</div>
+            <div class="sub" id="c-ot-year-sub">23.5h OT + 6.0h weekends</div>
         </div>
-        <div class="card good earnings-col" id="card-unpaid" style="grid-column: span 1">
+        <div class="card good earnings-col" id="card-unpaid" style="grid-column: span 1; display: none;">
             <div class="label">YTD Unpaid Value</div>
-            <div class="value" id="c-unpaid">—</div>
-            <div class="sub" id="c-unpaid-sub">add salary to calculate</div>
+            <div class="value" id="c-unpaid">$2,442</div>
+            <div class="sub" id="c-unpaid-sub">at $82.79/h contracted rate</div>
         </div>
-        <div class="card earnings-col" id="card-eff-rate">
+        <div class="card warn earnings-col" id="card-eff-rate" style="display: none;">
             <div class="label">Effective Rate (YTD)</div>
-            <div class="value" id="c-eff-rate">—</div>
-            <div class="sub" id="c-eff-rate-sub">add salary to calculate</div>
+            <div class="value" id="c-eff-rate" style="color: rgb(192, 57, 43);">$73.57/h</div>
+            <div class="sub" id="c-eff-rate-sub">vs $82.79/h contracted</div>
         </div>
     </div>
 
@@ -212,25 +219,526 @@
     <!-- Week Projection -->
     <div class="panel" id="projection-panel">
         <h2 style="font-size:0.95rem;font-weight:700;color:#0f2d52;margin-bottom:14px">📈 Week Projection</h2>
-        <div id="projection-content"></div>
+        <div id="projection-content">
+        <div style="display:grid;grid-template-columns:1fr 1fr ;gap:12px;margin-bottom:18px">
+            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Logged This Week</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">0.0h</div>
+                <div style="font-size:0.78rem;color:#999;margin-top:3px">of 38h contract</div>
+            </div>
+            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid #1a7a4a">
+                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Projected Week Total</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#1a7a4a">25.9h</div>
+                <div style="font-size:0.78rem;margin-top:3px"><span style="color:#b7600a;font-weight:700">−12.1h under</span></div>
+            </div>
+            
+        </div>
+
+        <!-- Progress bar -->
+        <div style="margin-bottom:18px">
+            <div style="position:relative;height:28px;background:#f0f0f0;border-radius:14px;overflow:hidden">
+                <div style="position:absolute;left:0;top:0;height:100%;width:48.72569354420534%;background:#fca5a5;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:0%;background:#0f2d52;border-radius:14px"></div>
+                <div style="position:absolute;left:71.42857142857143%;top:0;height:100%;width:2px;background:#f59e0b;z-index:2"></div>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:7px;font-size:0.75rem;color:#888;flex-wrap:wrap">
+                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged 0.0h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected 25.9h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>Contract 38h</span>
+            </div>
+        </div>
+
+        <!-- Per-day plan -->
+        
+        <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#888;margin-bottom:4px">
+            Plan remaining days <span style="font-weight:400;text-transform:none;letter-spacing:0">(override the average for any day)</span>
+        </div>
+        
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Wed 10 Jun</div>
+                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.6 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-06-10', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999">avg 8.6h</div>
+                
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Thu 11 Jun</div>
+                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.6 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-06-11', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999">avg 8.6h</div>
+                
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Fri 12 Jun</div>
+                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.6 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-06-12', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999">avg 8.6h</div>
+                
+            </div></div>
     </div>
 
     <!-- Weekly Breakdown -->
     <div class="panel">
         <div class="table-header">
             <h2>Weekly Breakdown</h2>
-            <span id="week-count"></span>
+            <span id="week-count">6 weeks</span>
         </div>
-        <div id="weekly-table"><div class="empty">Log some hours to see your weekly breakdown.</div></div>
+        <div id="weekly-table"><table>
+            <thead><tr>
+                <th>Week</th>
+                <th>Weekday Hrs</th>
+                <th>Weekend Hrs</th>
+                <th>Contract</th>
+                <th>Weekday OT</th>
+                <th>Total Unpaid Hrs</th>
+                <th class="earnings-col" style="display: none;">Effective Rate</th>
+                <th class="earnings-col" style="display: none;">Unpaid Value</th>
+            </tr></thead><tbody><tr class="">
+                <td><strong>1 June – 7 June</strong></td>
+                <td><strong>37.1h</strong></td>
+                <td><span class="text-muted">—</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-under">−0.9h</span></td>
+                <td><span class="text-muted">0h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$84.85/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.79</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
+            </tr><tr class="ot-row">
+                <td><strong>25 May – 31 May</strong></td>
+                <td><strong>42.5h</strong></td>
+                <td><span class="text-muted">—</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-ot">+4.5h</span></td>
+                <td><span class="text-red">4.5h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.03/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.79</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$373</span></td>
+            </tr><tr class="ot-row">
+                <td><strong>18 May – 24 May</strong></td>
+                <td><strong>41.3h</strong></td>
+                <td><span class="text-muted">—</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-ot">+3.3h</span></td>
+                <td><span class="text-red">3.3h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$76.27/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.79</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$269</span></td>
+            </tr><tr class="ot-row">
+                <td><strong>11 May – 17 May</strong></td>
+                <td><strong>42.0h</strong></td>
+                <td><span class="text-muted">—</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-ot">+4.0h</span></td>
+                <td><span class="text-red">4.0h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.91/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.79</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$331</span></td>
+            </tr><tr class="ot-row">
+                <td><strong>4 May – 10 May</strong></td>
+                <td><strong>42.3h</strong></td>
+                <td><span class="text-muted">—</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-ot">+4.3h</span></td>
+                <td><span class="text-red">4.3h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.47/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.79</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$352</span></td>
+            </tr><tr class="ot-row">
+                <td><strong>27 Apr – 3 May</strong></td>
+                <td><strong>45.5h</strong></td>
+                <td><span class="badge badge-ot">6.0h</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-ot">+7.5h</span></td>
+                <td><span class="text-red">13.5h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$61.09/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.79</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$1,118</span></td>
+            </tr></tbody><tfoot>
+            <tr style="background:#f7f9fc;font-weight:700;border-top:2px solid #eee">
+                <td style="color:#555;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">All Time</td>
+                <td>250.6h</td>
+                <td><span class="text-red">6.0h</span></td>
+                <td>—</td>
+                <td><span class="badge badge-ot">23.5h OT</span></td>
+                <td><span class="text-red">29.5h</span></td>
+                <td class="earnings-col" style="display: none;">—</td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$2,442</span></td>
+            </tr>
+        </tfoot></table></div>
     </div>
 
     <!-- All Entries -->
     <div class="panel">
         <div class="table-header">
             <h2>All Entries</h2>
-            <span id="entry-count"></span>
+            <span id="entry-count">30 entries</span>
         </div>
-        <div id="entries-table"><div class="empty">No entries yet. Start by logging your hours above.</div></div>
+        <div id="entries-table"><table>
+            <thead><tr>
+                <th>Date</th>
+                <th>Project / Task</th>
+                <th>Time</th>
+                <th>Hours</th>
+                <th>Week</th>
+                <th style="width:120px"></th>
+            </tr></thead><tbody><tr>
+                <td>Thu, 4 June 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9.83h</td>
+                <td class="text-muted" style="font-size:0.78em">1 June – 7 June</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1780605417415ywjg32u2ny')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1780605417415ywjg32u2ny')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 3 June 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9.5h</td>
+                <td class="text-muted" style="font-size:0.78em">1 June – 7 June</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1780552914012wgr1jq2rkua')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1780552914012wgr1jq2rkua')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 2 June 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>8.75h</td>
+                <td class="text-muted" style="font-size:0.78em">1 June – 7 June</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1780552914012pysaaqhlwmh')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1780552914012pysaaqhlwmh')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 1 June 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9h</td>
+                <td class="text-muted" style="font-size:0.78em">1 June – 7 June</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1780552914012kotsag0en5')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1780552914012kotsag0en5')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Fri, 29 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–14:45</span></td>
+                <td>8.25h</td>
+                <td class="text-muted" style="font-size:0.78em">25 May – 31 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('17802609696765f3el344mk6')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('17802609696765f3el344mk6')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Thu, 28 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–15:00</span></td>
+                <td>8.5h</td>
+                <td class="text-muted" style="font-size:0.78em">25 May – 31 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('17800127635060u7ebja10am')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('17800127635060u7ebja10am')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 27 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–15:30</span></td>
+                <td>9h</td>
+                <td class="text-muted" style="font-size:0.78em">25 May – 31 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1780012763506cf34nyywvla')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1780012763506cf34nyywvla')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 26 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–15:45</span></td>
+                <td>9.25h</td>
+                <td class="text-muted" style="font-size:0.78em">25 May – 31 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1780012763506x00yyjgpsxn')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1780012763506x00yyjgpsxn')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 25 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">08:00–16:00</span></td>
+                <td>7.5h</td>
+                <td class="text-muted" style="font-size:0.78em">25 May – 31 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1780012763506uwgdsnhsntp')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1780012763506uwgdsnhsntp')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Fri, 22 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–13:00</span></td>
+                <td>6.5h</td>
+                <td class="text-muted" style="font-size:0.78em">18 May – 24 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1779428567033hhutqdnfyfd')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1779428567033hhutqdnfyfd')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Thu, 21 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9h</td>
+                <td class="text-muted" style="font-size:0.78em">18 May – 24 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1779398682818zpnalnhk4b9')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1779398682818zpnalnhk4b9')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 20 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–16:00</span></td>
+                <td>9.5h</td>
+                <td class="text-muted" style="font-size:0.78em">18 May – 24 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1779257203099kthrn2nv5rn')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1779257203099kthrn2nv5rn')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 19 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–16:00</span></td>
+                <td>9.5h</td>
+                <td class="text-muted" style="font-size:0.78em">18 May – 24 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1779257203099suf0cfexadk')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1779257203099suf0cfexadk')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 18 May 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">08:30–15:45</span></td>
+                <td>6.75h</td>
+                <td class="text-muted" style="font-size:0.78em">18 May – 24 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1779257203099sy5czrt3md')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1779257203099sy5czrt3md')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Fri, 15 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>6h</td>
+                <td class="text-muted" style="font-size:0.78em">11 May – 17 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778812180091c6ov50t1l28')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778812180091c6ov50t1l28')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Thu, 14 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9.5h</td>
+                <td class="text-muted" style="font-size:0.78em">11 May – 17 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298osdolej8e8j')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298osdolej8e8j')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 13 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9.5h</td>
+                <td class="text-muted" style="font-size:0.78em">11 May – 17 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298z1a18rt221')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298z1a18rt221')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 12 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9.75h</td>
+                <td class="text-muted" style="font-size:0.78em">11 May – 17 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298gcer0qvq7i')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298gcer0qvq7i')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 11 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>7.25h</td>
+                <td class="text-muted" style="font-size:0.78em">11 May – 17 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298gsnlkwfjn2')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298gsnlkwfjn2')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Fri, 8 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>6h</td>
+                <td class="text-muted" style="font-size:0.78em">4 May – 10 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298n1uifzwdxhd')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298n1uifzwdxhd')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Thu, 7 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9h</td>
+                <td class="text-muted" style="font-size:0.78em">4 May – 10 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298hdwknw5yxha')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298hdwknw5yxha')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 6 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>8.75h</td>
+                <td class="text-muted" style="font-size:0.78em">4 May – 10 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298olrin7qu4l7')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298olrin7qu4l7')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 5 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9.5h</td>
+                <td class="text-muted" style="font-size:0.78em">4 May – 10 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('17788105912981bv4bppk082')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('17788105912981bv4bppk082')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 4 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9h</td>
+                <td class="text-muted" style="font-size:0.78em">4 May – 10 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298soyes9edrj')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298soyes9edrj')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr class="ot-row">
+                <td>Sat, 2 May 2026 <span class="badge badge-ot" style="font-size:0.68rem;padding:1px 6px">Weekend</span></td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>6h</td>
+                <td class="text-muted" style="font-size:0.78em">27 Apr – 3 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298m17c53l1s2e')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298m17c53l1s2e')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Fri, 1 May 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9h</td>
+                <td class="text-muted" style="font-size:0.78em">27 Apr – 3 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810591298n8zgjt7cqaa')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810591298n8zgjt7cqaa')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Thu, 30 Apr 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>10h</td>
+                <td class="text-muted" style="font-size:0.78em">27 Apr – 3 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('17788106728740i1313ircvyd')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('17788106728740i1313ircvyd')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 29 Apr 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>9.75h</td>
+                <td class="text-muted" style="font-size:0.78em">27 Apr – 3 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('17788106728744cp21yklflj')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('17788106728744cp21yklflj')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 28 Apr 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>8.75h</td>
+                <td class="text-muted" style="font-size:0.78em">27 Apr – 3 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810672874hc2aszutfpm')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810672874hc2aszutfpm')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 27 Apr 2026</td>
+                <td>DCE</td>
+                <td><span class="text-muted">—</span></td>
+                <td>8h</td>
+                <td class="text-muted" style="font-size:0.78em">27 Apr – 3 May</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1778810672874e1cqkv8i2w8')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1778810672874e1cqkv8i2w8')">Delete</button>
+                    </div>
+                </td>
+            </tr></tbody></table></div>
     </div>
 
 </div>
@@ -250,6 +758,11 @@
       {"date":"2026-05-27","project":"DCE","hours":9},     // 0600–1530, –30min lunch
       {"date":"2026-05-28","project":"DCE","hours":8.5},   // 0600–1500, –30min lunch
       {"date":"2026-05-29","project":"DCE","hours":8.25},  // 0600–1445, –30min lunch
+      // Week of 1 June 2026
+      {"date":"2026-06-01","project":"DCE","hours":9},     // 0600–1530, –30min lunch
+      {"date":"2026-06-02","project":"DCE","hours":8.75},  // 0600–1515, –30min lunch
+      {"date":"2026-06-03","project":"DCE","hours":9.5},   // 0600–1600, –30min lunch
+      {"date":"2026-06-04","project":"DCE","hours":9.83},  // 0540–1600, –30min lunch (9h50m)
     ];
 
     // ── Backfill start/end times recovered from chat history ──────────────────
@@ -306,7 +819,82 @@
         if (settings.hourlyRate)    document.getElementById('hourlyRate').value = settings.hourlyRate;
         if (settings.showEarnings === false) document.getElementById('showEarnings').checked = false;
         applyEarningsToggle();
+        loadGhToken();
         renderAll();
+    }
+
+    // ── GitHub Push ───────────────────────────────────────────────────────────
+    const GH_REPO  = 'flamingboot96/index.html';
+    const GH_FILE  = 'index.html';
+    const GH_TOKEN_KEY = 'eptec_v2_gh_token';
+
+    function saveGhToken() {
+        const t = document.getElementById('ghToken').value.trim();
+        if (t) localStorage.setItem(GH_TOKEN_KEY, t);
+        else localStorage.removeItem(GH_TOKEN_KEY);
+    }
+
+    function loadGhToken() {
+        const t = localStorage.getItem(GH_TOKEN_KEY);
+        if (t) document.getElementById('ghToken').value = t;
+    }
+
+    async function pushToGitHub() {
+        const btn    = document.getElementById('ghPushBtn');
+        const status = document.getElementById('ghPushStatus');
+        const token  = document.getElementById('ghToken').value.trim();
+        if (!token) { status.style.color = '#c0392b'; status.textContent = 'Paste your GitHub token first.'; return; }
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Pushing…';
+        status.style.color = '#888';
+        status.textContent = 'Fetching current file SHA…';
+
+        try {
+            // 1. Get current SHA
+            const metaResp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
+                headers: { 'Authorization': `token ${token}`, 'User-Agent': 'eptec-tracker' }
+            });
+            if (!metaResp.ok) throw new Error(`SHA fetch failed: ${metaResp.status}`);
+            const meta = await metaResp.json();
+            const sha  = meta.sha;
+
+            // 2. Grab the page HTML directly from the DOM
+            status.textContent = 'Encoding file…';
+            const srcText = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+            // 3. Base64 encode (handles unicode)
+            const b64 = btoa(unescape(encodeURIComponent(srcText)));
+
+            // 4. PUT to GitHub
+            status.textContent = 'Uploading…';
+            const putResp = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'eptec-tracker'
+                },
+                body: JSON.stringify({
+                    message: 'Update tracker via Push button',
+                    content: b64,
+                    sha: sha
+                })
+            });
+            const result = await putResp.json();
+            if (result.commit) {
+                status.style.color = '#1a7a4a';
+                status.textContent = `✓ Pushed! Commit ${result.commit.sha.slice(0,7)} — live in ~30s`;
+            } else {
+                throw new Error(result.message || JSON.stringify(result));
+            }
+        } catch (err) {
+            status.style.color = '#c0392b';
+            status.textContent = '✗ ' + err.message;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '↑ Push to GitHub';
+        }
     }
 
     // ── Settings ──────────────────────────────────────────────────────────────
@@ -946,5 +1534,6 @@
     // ── Go ────────────────────────────────────────────────────────────────────
     init();
 </script>
-</body>
-</html>
+
+
+</body></html>
