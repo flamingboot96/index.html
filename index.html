@@ -160,7 +160,7 @@
     <div class="cards">
         <div class="card">
             <div class="label">This Week (Weekdays)</div>
-            <div class="value" id="c-this-week">0.0h</div>
+            <div class="value" id="c-this-week">16.5h</div>
             <div class="sub" id="c-this-week-sub">of 38h contracted</div>
         </div>
 
@@ -181,7 +181,7 @@
         </div>
         <div class="card warn earnings-col" id="card-eff-rate" style="display: none;">
             <div class="label">Effective Rate (YTD)</div>
-            <div class="value" id="c-eff-rate" style="color: rgb(192, 57, 43);">$71.97/h</div>
+            <div class="value" id="c-eff-rate" style="color: rgb(192, 57, 43);">$76.75/h</div>
             <div class="sub" id="c-eff-rate-sub">vs $82.79/h contracted</div>
         </div>
     </div>
@@ -223,13 +223,13 @@
         <div style="display:grid;grid-template-columns:1fr 1fr ;gap:12px;margin-bottom:18px">
             <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px">
                 <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Logged This Week</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">0.0h</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">16.5h</div>
                 <div style="font-size:0.78rem;color:#999;margin-top:3px">of 38h contract</div>
             </div>
             <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid #c0392b">
                 <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Projected Week Total</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#c0392b">43.0h</div>
-                <div style="font-size:0.78rem;margin-top:3px"><span style="color:#c0392b;font-weight:700">+5.0h overtime</span></div>
+                <div style="font-size:1.6rem;font-weight:800;color:#c0392b">42.3h</div>
+                <div style="font-size:0.78rem;margin-top:3px"><span style="color:#c0392b;font-weight:700">+4.3h overtime</span></div>
             </div>
             
         </div>
@@ -237,13 +237,13 @@
         <!-- Progress bar -->
         <div style="margin-bottom:18px">
             <div style="position:relative;height:28px;background:#f0f0f0;border-radius:14px;overflow:hidden">
-                <div style="position:absolute;left:0;top:0;height:100%;width:80.91269841269842%;background:#fca5a5;border-radius:14px"></div>
-                <div style="position:absolute;left:0;top:0;height:100%;width:0%;background:#0f2d52;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:79.476483762598%;background:#fca5a5;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:31.015037593984967%;background:#0f2d52;border-radius:14px"></div>
                 <div style="position:absolute;left:71.42857142857143%;top:0;height:100%;width:2px;background:#f59e0b;z-index:2"></div>
             </div>
             <div style="display:flex;gap:16px;margin-top:7px;font-size:0.75rem;color:#888;flex-wrap:wrap">
-                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged 0.0h</span>
-                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected 43.0h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged 16.5h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected 42.3h</span>
                 <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>Contract 38h</span>
             </div>
         </div>
@@ -254,18 +254,6 @@
             Plan remaining days <span style="font-weight:400;text-transform:none;letter-spacing:0">(override the average for any day)</span>
         </div>
         
-            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Mon 29 Jun</div>
-                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.6 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-06-29', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
-                <div style="font-size:0.78rem;color:#999">avg 8.6h</div>
-                
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Tue 30 Jun</div>
-                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.6 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-06-30', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
-                <div style="font-size:0.78rem;color:#999">avg 8.6h</div>
-                
-            </div>
             <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
                 <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Wed 1 Jul</div>
                 <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.6 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-07-01', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
@@ -290,7 +278,7 @@
     <div class="panel">
         <div class="table-header">
             <h2>Weekly Breakdown</h2>
-            <span id="week-count">9 weeks</span>
+            <span id="week-count">10 weeks</span>
         </div>
         <div id="weekly-table"><table>
             <thead><tr>
@@ -302,7 +290,17 @@
                 <th>Total Unpaid Hrs</th>
                 <th class="earnings-col" style="display: none;">Effective Rate</th>
                 <th class="earnings-col" style="display: none;">Unpaid Value</th>
-            </tr></thead><tbody><tr class="ot-row">
+            </tr></thead><tbody><tr class="">
+                <td><strong>29 June – 5 July</strong></td>
+                <td><strong>16.5h</strong></td>
+                <td><span class="text-muted">—</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-under">−21.5h</span></td>
+                <td><span class="text-muted">0h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$190.68/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.79</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
+            </tr><tr class="ot-row">
                 <td><strong>22 June – 28 June</strong></td>
                 <td><strong>48.2h</strong></td>
                 <td><span class="text-muted">—</span></td>
@@ -395,7 +393,7 @@
             </tr></tbody><tfoot>
             <tr style="background:#f7f9fc;font-weight:700;border-top:2px solid #eee">
                 <td style="color:#555;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">All Time</td>
-                <td>387.4h</td>
+                <td>403.9h</td>
                 <td><span class="text-red">6.0h</span></td>
                 <td>—</td>
                 <td><span class="badge badge-ot">45.4h OT</span></td>
@@ -410,7 +408,7 @@
     <div class="panel">
         <div class="table-header">
             <h2>All Entries</h2>
-            <span id="entry-count">47 entries</span>
+            <span id="entry-count">49 entries</span>
         </div>
         <div id="entries-table"><table>
             <thead><tr>
@@ -421,6 +419,30 @@
                 <th>Week</th>
                 <th style="width:120px"></th>
             </tr></thead><tbody><tr>
+                <td>Tue, 30 June 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–14:30</span></td>
+                <td>8h</td>
+                <td class="text-muted" style="font-size:0.78em">29 June – 5 July</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1782852729391uann4nf07hb')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1782852729391uann4nf07hb')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 29 June 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–15:00</span></td>
+                <td>8.5h</td>
+                <td class="text-muted" style="font-size:0.78em">29 June – 5 July</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1782852729391z3eiijwvy1')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1782852729391z3eiijwvy1')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
                 <td>Fri, 26 June 2026</td>
                 <td>DCE</td>
                 <td><span style="font-size:0.82em;color:#555;white-space:nowrap">05:45–14:45</span></td>
@@ -1028,6 +1050,9 @@
       {"date":"2026-06-24","project":"DCE","hours":8.75},  // 0600–1515, –30min lunch
       {"date":"2026-06-25","project":"DCE","hours":9.0},   // 0600–1530, –30min lunch
       {"date":"2026-06-26","project":"DCE","hours":8.5},   // 0545–1445, –30min lunch
+      // Week of 29 June 2026
+      {"date":"2026-06-29","project":"DCE","hours":8.5},   // 0600–1500, –30min lunch
+      {"date":"2026-06-30","project":"DCE","hours":8.0},   // 0600–1430, –30min lunch
     ];
 
     // ── Backfill start/end times recovered from chat history ──────────────────
@@ -1056,6 +1081,8 @@
       {"date":"2026-06-24","project":"DCE","hours":8.75,  "startTime":"06:00","endTime":"15:15"},
       {"date":"2026-06-25","project":"DCE","hours":9.0,   "startTime":"06:00","endTime":"15:30"},
       {"date":"2026-06-26","project":"DCE","hours":8.5,   "startTime":"05:45","endTime":"14:45"},
+      {"date":"2026-06-29","project":"DCE","hours":8.5,   "startTime":"06:00","endTime":"15:00"},
+      {"date":"2026-06-30","project":"DCE","hours":8.0,   "startTime":"06:00","endTime":"14:30"},
     ];
 
     // ── State ──────────────────────────────────────────────────────────────────
