@@ -128,7 +128,7 @@
             <label>Contract Hours / Week</label>
             <input type="number" id="contractHours" value="38" min="1" max="80" step="0.5" style="width:110px" oninput="saveSettings(); renderAll()">
         </div>
-        <div id="salary-fields" style="gap: 20px; align-items: flex-end; display: none;">
+        <div id="salary-fields" style="display: none; gap: 20px; align-items: flex-end;">
             <div class="fg">
                 <label>Annual Salary ($)</label>
                 <input type="number" id="annualSalary" placeholder="e.g. 97,500" style="width:150px" oninput="onSalaryInput(); saveSettings(); renderAll()">
@@ -152,7 +152,7 @@
                 <input type="password" id="ghToken" placeholder="ghp_…" style="width:170px;font-family:monospace;font-size:0.8rem" oninput="saveGhToken()">
                 <button onclick="pushToGitHub()" id="ghPushBtn" style="background:#0f2d52;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;position:relative" disabled="">⏳ Pushing…</button>
             </div>
-            <div id="ghPushStatus" style="font-size: 0.72rem; color: rgb(136, 136, 136); margin-top: 3px; min-height: 1em;">Encoding file…</div>
+            <div id="ghPushStatus" style="font-size:0.72rem;color:#888;margin-top:3px;min-height:1em">Encoding file…</div>
         </div>
     </div>
 
@@ -160,7 +160,7 @@
     <div class="cards">
         <div class="card">
             <div class="label">This Week (Weekdays)</div>
-            <div class="value" id="c-this-week">11.0h</div>
+            <div class="value" id="c-this-week">29.8h</div>
             <div class="sub" id="c-this-week-sub">of 38h contracted</div>
         </div>
 
@@ -181,7 +181,7 @@
         </div>
         <div class="card warn earnings-col" id="card-eff-rate" style="display: none;">
             <div class="label">Effective Rate (YTD)</div>
-            <div class="value" id="c-eff-rate" style="color: rgb(192, 57, 43);">$62.98/h</div>
+            <div class="value" id="c-eff-rate" style="color: rgb(192, 57, 43);">$60.38/h</div>
             <div class="sub" id="c-eff-rate-sub">vs $65.79/h contracted</div>
         </div>
     </div>
@@ -223,13 +223,13 @@
         <div style="display:grid;grid-template-columns:1fr 1fr ;gap:12px;margin-bottom:18px">
             <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px">
                 <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Logged This Week</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">11.0h</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">29.8h</div>
                 <div style="font-size:0.78rem;color:#999;margin-top:3px">of 38h contract</div>
             </div>
-            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid #1a7a4a">
+            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid #c0392b">
                 <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Projected Week Total</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#1a7a4a">36.3h</div>
-                <div style="font-size:0.78rem;margin-top:3px"><span style="color:#b7600a;font-weight:700">−1.7h under</span></div>
+                <div style="font-size:1.6rem;font-weight:800;color:#c0392b">38.2h</div>
+                <div style="font-size:0.78rem;margin-top:3px"><span style="color:#c0392b;font-weight:700">+0.2h overtime</span></div>
             </div>
             
         </div>
@@ -237,13 +237,13 @@
         <!-- Progress bar -->
         <div style="margin-bottom:18px">
             <div style="position:relative;height:28px;background:#f0f0f0;border-radius:14px;overflow:hidden">
-                <div style="position:absolute;left:0;top:0;height:100%;width:68.29721362229103%;background:#fca5a5;border-radius:14px"></div>
-                <div style="position:absolute;left:0;top:0;height:100%;width:20.67669172932331%;background:#0f2d52;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:71.86054759540362%;background:#fca5a5;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:55.92105263157895%;background:#0f2d52;border-radius:14px"></div>
                 <div style="position:absolute;left:71.42857142857143%;top:0;height:100%;width:2px;background:#f59e0b;z-index:2"></div>
             </div>
             <div style="display:flex;gap:16px;margin-top:7px;font-size:0.75rem;color:#888;flex-wrap:wrap">
-                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged 11.0h</span>
-                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected 36.3h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged 29.8h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected 38.2h</span>
                 <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>Contract 38h</span>
             </div>
         </div>
@@ -255,21 +255,9 @@
         </div>
         
             <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Wed 8 Jul</div>
-                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.4 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-07-08', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
-                <div style="font-size:0.78rem;color:#999">avg 8.4h</div>
-                
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Thu 9 Jul</div>
-                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.4 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-07-09', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
-                <div style="font-size:0.78rem;color:#999">avg 8.4h</div>
-                
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
                 <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Fri 10 Jul</div>
-                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.4 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-07-10', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
-                <div style="font-size:0.78rem;color:#999">avg 8.4h</div>
+                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.5 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-07-10', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999">avg 8.5h</div>
                 
             </div></div>
     </div>
@@ -292,12 +280,12 @@
                 <th class="earnings-col" style="display: none;">Unpaid Value</th>
             </tr></thead><tbody><tr class="">
                 <td><strong>6 July – 12 July</strong></td>
-                <td><strong>11.0h</strong></td>
+                <td><strong>29.8h</strong></td>
                 <td><span class="text-muted">—</span></td>
                 <td>38h</td>
-                <td><span class="badge badge-under">−27.0h</span></td>
+                <td><span class="badge badge-under">−8.3h</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col" style="display: none;"><span class="text-green">$227.27/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$84.03/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $65.79</span></td>
                 <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
             </tr><tr class="ot-row">
@@ -403,7 +391,7 @@
             </tr></tbody><tfoot>
             <tr style="background:#f7f9fc;font-weight:700;border-top:2px solid #eee">
                 <td style="color:#555;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">All Time</td>
-                <td>430.7h</td>
+                <td>449.4h</td>
                 <td><span class="text-red">6.0h</span></td>
                 <td>—</td>
                 <td><span class="badge badge-ot">39.7h OT</span></td>
@@ -418,7 +406,7 @@
     <div class="panel">
         <div class="table-header">
             <h2>All Entries</h2>
-            <span id="entry-count">52 entries</span>
+            <span id="entry-count">54 entries</span>
         </div>
         <div id="entries-table"><table>
             <thead><tr>
@@ -429,15 +417,39 @@
                 <th>Week</th>
                 <th style="width:120px"></th>
             </tr></thead><tbody><tr>
-                <td>Tue, 7 July 2026</td>
+                <td>Thu, 9 July 2026</td>
                 <td>DCE</td>
-                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">05:45–17:15</span></td>
-                <td>11h</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">05:45–15:30</span></td>
+                <td>9.25h</td>
                 <td class="text-muted" style="font-size:0.78em">6 July – 12 July</td>
                 <td>
                     <div class="actions">
-                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1783455404655jyhhcapamrj')">Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1783455404655jyhhcapamrj')">Delete</button>
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1783646135215k7owr9sq2p')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1783646135215k7owr9sq2p')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 8 July 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">05:45–15:15</span></td>
+                <td>9h</td>
+                <td class="text-muted" style="font-size:0.78em">6 July – 12 July</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1783646135215efslg85ujp')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1783646135215efslg85ujp')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 7 July 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">05:45–17:45</span></td>
+                <td>11.5h</td>
+                <td class="text-muted" style="font-size:0.78em">6 July – 12 July</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1783469281791nxpp5m8bj5s')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1783469281791nxpp5m8bj5s')">Delete</button>
                     </div>
                 </td>
             </tr><tr>
@@ -1103,7 +1115,9 @@
       {"date":"2026-07-01","project":"DCE","hours":10.0},  // 0600–1630, no lunch taken (logged as 1630 for correct deduction)
       {"date":"2026-07-02","project":"DCE","hours":8.75},  // 0545–1500, –30min lunch
       {"date":"2026-07-03","project":"DCE","hours":5.75},  // 0545–1130, no lunch deduction
-      {"date":"2026-07-07","project":"DCE","hours":11.0},  // 0545–1715, –30min lunch
+      {"date":"2026-07-07","project":"DCE","hours":11.5},  // 0545–1715, no lunch taken (logged as 1745 for correct deduction)
+      {"date":"2026-07-08","project":"DCE","hours":9.0},   // 0545–1515, –30min lunch
+      {"date":"2026-07-09","project":"DCE","hours":9.25},  // 0545–1530, –30min lunch
     ];
 
     // ── Backfill start/end times recovered from chat history ──────────────────
@@ -1137,7 +1151,9 @@
       {"date":"2026-07-01","project":"DCE","hours":10.0,  "startTime":"06:00","endTime":"16:30"},
       {"date":"2026-07-02","project":"DCE","hours":8.75,  "startTime":"05:45","endTime":"15:00"},
       {"date":"2026-07-03","project":"DCE","hours":5.75,  "startTime":"05:45","endTime":"11:30"},
-      {"date":"2026-07-07","project":"DCE","hours":11.0,  "startTime":"05:45","endTime":"17:15"},
+      {"date":"2026-07-07","project":"DCE","hours":11.5,  "startTime":"05:45","endTime":"17:45"},
+      {"date":"2026-07-08","project":"DCE","hours":9.0,   "startTime":"05:45","endTime":"15:15"},
+      {"date":"2026-07-09","project":"DCE","hours":9.25,  "startTime":"05:45","endTime":"15:30"},
     ];
 
     // ── State ──────────────────────────────────────────────────────────────────
