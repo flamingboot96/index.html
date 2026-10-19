@@ -128,7 +128,7 @@
             <label>Contract Hours / Week</label>
             <input type="number" id="contractHours" value="38" min="1" max="80" step="0.5" style="width:110px" oninput="saveSettings(); renderAll()">
         </div>
-        <div id="salary-fields" style="gap: 20px; align-items: flex-end;">
+        <div id="salary-fields" style="display: none; gap: 20px; align-items: flex-end;">
             <div class="fg">
                 <label>Annual Salary ($)</label>
                 <input type="number" id="annualSalary" placeholder="e.g. 97,500" style="width:150px" oninput="onSalaryInput(); saveSettings(); renderAll()">
@@ -160,28 +160,28 @@
     <div class="cards">
         <div class="card">
             <div class="label">This Week (Weekdays)</div>
-            <div class="value" id="c-this-week">26.6h</div>
+            <div class="value" id="c-this-week">9.8h</div>
             <div class="sub" id="c-this-week-sub">of 38h contracted</div>
         </div>
 
         <div class="card warn">
             <div class="label">Weekend Hours YTD</div>
-            <div class="value" id="c-weekend-year">17.5h</div>
+            <div class="value" id="c-weekend-year">21.5h</div>
             <div class="sub" id="c-weekend-year-sub">in 2026</div>
         </div>
         <div class="card warn">
             <div class="label">Total Unpaid Hours YTD</div>
-            <div class="value" id="c-ot-year">81.5h</div>
-            <div class="sub" id="c-ot-year-sub">64.0h OT + 17.5h weekends</div>
+            <div class="value" id="c-ot-year">89.4h</div>
+            <div class="sub" id="c-ot-year-sub">67.9h OT + 21.5h weekends</div>
         </div>
-        <div class="card good earnings-col" id="card-unpaid" style="grid-column: span 1">
+        <div class="card good earnings-col" id="card-unpaid" style="grid-column: span 1; display: none;">
             <div class="label">YTD Unpaid Value</div>
-            <div class="value" id="c-unpaid">$6,750</div>
+            <div class="value" id="c-unpaid">$7,409</div>
             <div class="sub" id="c-unpaid-sub">at $82.84/h contracted rate</div>
         </div>
-        <div class="card warn earnings-col" id="card-eff-rate">
+        <div class="card warn earnings-col" id="card-eff-rate" style="display: none;">
             <div class="label">Effective Rate (YTD)</div>
-            <div class="value" id="c-eff-rate" style="color: rgb(192, 57, 43);">$76.93/h</div>
+            <div class="value" id="c-eff-rate" style="color: rgb(192, 57, 43);">$78.01/h</div>
             <div class="sub" id="c-eff-rate-sub">vs $82.84/h contracted</div>
         </div>
     </div>
@@ -190,12 +190,12 @@
     <div class="panel" id="toil-panel">
         <div class="table-header">
             <h2>🔄 Time Off In Lieu (Weekend Work)</h2>
-            <span id="toil-balance-badge"><span class="badge badge-ok">2 days off owed to you</span></span>
+            <span id="toil-balance-badge"><span class="badge badge-ok">3 days off owed to you</span></span>
         </div>
         <div class="cards" style="margin-bottom:16px">
             <div class="card">
                 <div class="label">Weekend Days Worked</div>
-                <div class="value" id="toil-banked" style="color:#1a7a4a">4</div>
+                <div class="value" id="toil-banked" style="color:#1a7a4a">5</div>
                 <div class="sub">days off earned</div>
             </div>
             <div class="card">
@@ -205,7 +205,7 @@
             </div>
             <div class="card good" id="toil-balance-card">
                 <div class="label">Balance</div>
-                <div class="value" id="toil-balance" style="color: rgb(26, 122, 74);">2</div>
+                <div class="value" id="toil-balance" style="color: rgb(26, 122, 74);">3</div>
                 <div class="sub" id="toil-balance-sub">days off owed to you</div>
             </div>
         </div>
@@ -223,7 +223,9 @@
                 <td style="text-align:right"><span class="text-green">+1 day</span></td>
                 <td style="text-align:right;font-weight:700">3 days</td></tr><tr><td>Mon, 28 Sept 2026 <span class="badge badge-under" style="font-size:0.68rem;padding:1px 6px">Lieu taken</span></td><td>Day off in lieu</td>
                 <td style="text-align:right"><span class="text-red">−1 day</span></td>
-                <td style="text-align:right;font-weight:700">2 days</td></tr></tbody></table></div>
+                <td style="text-align:right;font-weight:700">2 days</td></tr><tr><td>Sat, 17 Oct 2026 <span class="badge badge-ok" style="font-size:0.68rem;padding:1px 6px">Weekend worked</span></td><td>Weekend worked (4.00h)</td>
+                <td style="text-align:right"><span class="text-green">+1 day</span></td>
+                <td style="text-align:right;font-weight:700">3 days</td></tr></tbody></table></div>
     </div>
 
     <!-- Log Entry Form -->
@@ -260,40 +262,30 @@
     <div class="panel" id="projection-panel">
         <h2 style="font-size:0.95rem;font-weight:700;color:#0f2d52;margin-bottom:14px">📈 Week Projection</h2>
         <div id="projection-content">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr ;gap:12px;margin-bottom:18px">
             <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px">
                 <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Logged This Week</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">26.6h</div>
+                <div style="font-size:1.6rem;font-weight:800;color:#0f2d52">9.8h</div>
                 <div style="font-size:0.78rem;color:#999;margin-top:3px">of 38h contract</div>
             </div>
             <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid #c0392b">
                 <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Projected Week Total</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#c0392b">43.1h</div>
-                <div style="font-size:0.78rem;margin-top:3px"><span style="color:#c0392b;font-weight:700">+5.1h overtime</span></div>
+                <div style="font-size:1.6rem;font-weight:800;color:#c0392b">38.5h</div>
+                <div style="font-size:0.78rem;margin-top:3px"><span style="color:#c0392b;font-weight:700">+0.5h overtime</span></div>
             </div>
             
-            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid #c0392b">
-                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Projected Unpaid Value</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#c0392b">$422</div>
-                <div style="font-size:0.78rem;color:#999;margin-top:3px">this week</div>
-            </div>
-            <div style="background:#f7f9fc;border-radius:8px;padding:14px 16px;border-left:3px solid #c0392b">
-                <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin-bottom:6px">Effective Rate (This Week)</div>
-                <div style="font-size:1.6rem;font-weight:800;color:#c0392b">$73.06/h</div>
-                <div style="font-size:0.78rem;color:#999;margin-top:3px">vs $82.84/h contracted</div>
-            </div>
         </div>
 
         <!-- Progress bar -->
         <div style="margin-bottom:18px">
             <div style="position:relative;height:28px;background:#f0f0f0;border-radius:14px;overflow:hidden">
-                <div style="position:absolute;left:0;top:0;height:100%;width:80.99350941456207%;background:#fca5a5;border-radius:14px"></div>
-                <div style="position:absolute;left:0;top:0;height:100%;width:50.000000000000014%;background:#0f2d52;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:72.36842105263158%;background:#fca5a5;border-radius:14px"></div>
+                <div style="position:absolute;left:0;top:0;height:100%;width:18.327067669172934%;background:#0f2d52;border-radius:14px"></div>
                 <div style="position:absolute;left:71.42857142857143%;top:0;height:100%;width:2px;background:#f59e0b;z-index:2"></div>
             </div>
             <div style="display:flex;gap:16px;margin-top:7px;font-size:0.75rem;color:#888;flex-wrap:wrap">
-                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged 26.6h</span>
-                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected 43.1h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#0f2d52;border-radius:2px;margin-right:4px"></span>Logged 9.8h</span>
+                <span><span style="display:inline-block;width:10px;height:10px;background:#fca5a5;border-radius:2px;margin-right:4px"></span>Projected 38.5h</span>
                 <span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>Contract 38h</span>
             </div>
         </div>
@@ -305,16 +297,28 @@
         </div>
         
             <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Thu 8 Oct</div>
-                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.2 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-10-08', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
-                <div style="font-size:0.78rem;color:#999">avg 8.2h</div>
-                
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Tue 20 Oct</div>
+                <input type="number" min="0" max="24" step="0.25" value="8" placeholder="8.2 (avg)" style="width:110px;border:1.5px solid #0f2d52;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-10-20', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999"><span style="color:#0f2d52;font-weight:600">8h planned</span></div>
+                <button onclick="updatePlanned('2026-10-20', '')" style="font-size:0.72rem;color:#aaa;background:none;border:none;cursor:pointer;padding:2px 6px">✕ reset</button>
             </div>
             <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
-                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Fri 9 Oct</div>
-                <input type="number" min="0" max="24" step="0.25" value="" placeholder="8.2 (avg)" style="width:110px;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-10-09', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
-                <div style="font-size:0.78rem;color:#999">avg 8.2h</div>
-                
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Wed 21 Oct</div>
+                <input type="number" min="0" max="24" step="0.25" value="5.25" placeholder="8.2 (avg)" style="width:110px;border:1.5px solid #0f2d52;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-10-21', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999"><span style="color:#0f2d52;font-weight:600">5.25h planned</span></div>
+                <button onclick="updatePlanned('2026-10-21', '')" style="font-size:0.72rem;color:#aaa;background:none;border:none;cursor:pointer;padding:2px 6px">✕ reset</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Thu 22 Oct</div>
+                <input type="number" min="0" max="24" step="0.25" value="7.75" placeholder="8.2 (avg)" style="width:110px;border:1.5px solid #0f2d52;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-10-22', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999"><span style="color:#0f2d52;font-weight:600">7.75h planned</span></div>
+                <button onclick="updatePlanned('2026-10-22', '')" style="font-size:0.72rem;color:#aaa;background:none;border:none;cursor:pointer;padding:2px 6px">✕ reset</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+                <div style="width:110px;font-size:0.85rem;font-weight:600;color:#333">Fri 23 Oct</div>
+                <input type="number" min="0" max="24" step="0.25" value="7.75" placeholder="8.2 (avg)" style="width:110px;border:1.5px solid #0f2d52;border-radius:6px;padding:5px 9px;font-size:0.85rem;font-family:inherit;outline:none" oninput="updatePlanned('2026-10-23', this.value)" onfocus="this.style.borderColor='#0f2d52'" onblur="this.style.borderColor=this.value ? '#0f2d52' : '#ddd'">
+                <div style="font-size:0.78rem;color:#999"><span style="color:#0f2d52;font-weight:600">7.75h planned</span></div>
+                <button onclick="updatePlanned('2026-10-23', '')" style="font-size:0.72rem;color:#aaa;background:none;border:none;cursor:pointer;padding:2px 6px">✕ reset</button>
             </div></div>
     </div>
 
@@ -322,7 +326,7 @@
     <div class="panel">
         <div class="table-header">
             <h2>Weekly Breakdown</h2>
-            <span id="week-count">24 weeks</span>
+            <span id="week-count">26 weeks</span>
         </div>
         <div id="weekly-table"><table>
             <thead><tr>
@@ -332,18 +336,38 @@
                 <th>Contract</th>
                 <th>Weekday OT</th>
                 <th>Total Unpaid Hrs</th>
-                <th class="earnings-col">Effective Rate</th>
-                <th class="earnings-col">Unpaid Value</th>
+                <th class="earnings-col" style="display: none;">Effective Rate</th>
+                <th class="earnings-col" style="display: none;">Unpaid Value</th>
             </tr></thead><tbody><tr class="">
-                <td><strong>5 Oct – 11 Oct</strong></td>
-                <td><strong>26.6h</strong></td>
+                <td><strong>19 Oct – 25 Oct</strong></td>
+                <td><strong>9.8h</strong></td>
                 <td><span class="text-muted">—</span></td>
                 <td>38h</td>
-                <td><span class="badge badge-under">−11.4h</span></td>
+                <td><span class="badge badge-under">−28.3h</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col"><span class="text-green">$118.35/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$322.88/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-muted">$0</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
+            </tr><tr class="ot-row">
+                <td><strong>12 Oct – 18 Oct</strong></td>
+                <td><strong>38.9h</strong></td>
+                <td><span class="badge badge-ot">4.0h</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-ot">+0.9h</span></td>
+                <td><span class="text-red">4.9h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$73.47/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$402</span></td>
+            </tr><tr class="ot-row">
+                <td><strong>5 Oct – 11 Oct</strong></td>
+                <td><strong>41.1h</strong></td>
+                <td><span class="text-muted">—</span></td>
+                <td>38h</td>
+                <td><span class="badge badge-ot">+3.1h</span></td>
+                <td><span class="text-red">3.1h</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$76.60/h</span>
+                    <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$257</span></td>
             </tr><tr class="ot-row">
                 <td><strong>28 Sept – 4 Oct</strong></td>
                 <td><strong>42.9h</strong></td>
@@ -351,9 +375,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+4.9h</span></td>
                 <td><span class="text-red">4.9h</span></td>
-                <td class="earnings-col"><span class="text-red">$73.47/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$73.47/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$402</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$402</span></td>
             </tr><tr class="">
                 <td><strong>21 Sept – 27 Sept</strong></td>
                 <td><strong>38.0h</strong></td>
@@ -361,9 +385,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ok">On contract</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col"><span class="text-green">$82.84/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$82.84/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-muted">$0</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
             </tr><tr class="ot-row">
                 <td><strong>14 Sept – 20 Sept</strong></td>
                 <td><strong>40.0h</strong></td>
@@ -371,9 +395,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+2.0h</span></td>
                 <td><span class="text-red">9.0h</span></td>
-                <td class="earnings-col"><span class="text-red">$66.98/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$66.98/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$746</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$746</span></td>
             </tr><tr class="ot-row">
                 <td><strong>7 Sept – 13 Sept</strong></td>
                 <td><strong>43.4h</strong></td>
@@ -381,9 +405,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+5.4h</span></td>
                 <td><span class="text-red">9.9h</span></td>
-                <td class="earnings-col"><span class="text-red">$65.79/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$65.79/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$816</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$816</span></td>
             </tr><tr class="ot-row">
                 <td><strong>31 Aug – 6 Sept</strong></td>
                 <td><strong>40.0h</strong></td>
@@ -391,9 +415,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+2.0h</span></td>
                 <td><span class="text-red">2.0h</span></td>
-                <td class="earnings-col"><span class="text-red">$78.70/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$78.70/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$166</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$166</span></td>
             </tr><tr class="">
                 <td><strong>24 Aug – 30 Aug</strong></td>
                 <td><strong>38.0h</strong></td>
@@ -401,9 +425,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ok">On contract</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col"><span class="text-green">$82.84/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$82.84/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-muted">$0</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
             </tr><tr class="ot-row">
                 <td><strong>17 Aug – 23 Aug</strong></td>
                 <td><strong>39.0h</strong></td>
@@ -411,9 +435,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+1.0h</span></td>
                 <td><span class="text-red">1.0h</span></td>
-                <td class="earnings-col"><span class="text-red">$80.72/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$80.72/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$83</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$83</span></td>
             </tr><tr class="ot-row">
                 <td><strong>10 Aug – 16 Aug</strong></td>
                 <td><strong>43.1h</strong></td>
@@ -421,9 +445,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+5.1h</span></td>
                 <td><span class="text-red">5.1h</span></td>
-                <td class="earnings-col"><span class="text-red">$73.04/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$73.04/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$423</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$423</span></td>
             </tr><tr class="">
                 <td><strong>3 Aug – 9 Aug</strong></td>
                 <td><strong>38.0h</strong></td>
@@ -431,9 +455,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ok">On contract</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col"><span class="text-green">$82.84/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$82.84/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-muted">$0</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
             </tr><tr class="">
                 <td><strong>27 July – 2 Aug</strong></td>
                 <td><strong>38.0h</strong></td>
@@ -441,9 +465,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ok">On contract</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col"><span class="text-green">$82.84/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$82.84/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-muted">$0</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
             </tr><tr class="">
                 <td><strong>20 July – 26 July</strong></td>
                 <td><strong>38.0h</strong></td>
@@ -451,9 +475,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ok">On contract</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col"><span class="text-green">$82.84/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$82.84/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-muted">$0</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
             </tr><tr class="ot-row">
                 <td><strong>13 July – 19 July</strong></td>
                 <td><strong>42.0h</strong></td>
@@ -461,9 +485,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+4.0h</span></td>
                 <td><span class="text-red">4.0h</span></td>
-                <td class="earnings-col"><span class="text-red">$74.95/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.95/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$331</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$331</span></td>
             </tr><tr class="">
                 <td><strong>6 July – 12 July</strong></td>
                 <td><strong>38.0h</strong></td>
@@ -471,9 +495,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ok">On contract</span></td>
                 <td><span class="text-muted">0h</span></td>
-                <td class="earnings-col"><span class="text-green">$82.84/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-green">$82.84/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-muted">$0</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-muted">$0</span></td>
             </tr><tr class="ot-row">
                 <td><strong>29 June – 5 July</strong></td>
                 <td><strong>41.0h</strong></td>
@@ -481,9 +505,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+3.0h</span></td>
                 <td><span class="text-red">3.0h</span></td>
-                <td class="earnings-col"><span class="text-red">$76.78/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$76.78/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$249</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$249</span></td>
             </tr><tr class="ot-row">
                 <td><strong>22 June – 28 June</strong></td>
                 <td><strong>39.5h</strong></td>
@@ -491,9 +515,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+1.5h</span></td>
                 <td><span class="text-red">1.5h</span></td>
-                <td class="earnings-col"><span class="text-red">$79.70/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$79.70/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$124</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$124</span></td>
             </tr><tr class="ot-row">
                 <td><strong>15 June – 21 June</strong></td>
                 <td><strong>42.3h</strong></td>
@@ -501,9 +525,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+4.3h</span></td>
                 <td><span class="text-red">4.3h</span></td>
-                <td class="earnings-col"><span class="text-red">$74.51/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.51/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$352</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$352</span></td>
             </tr><tr class="ot-row">
                 <td><strong>8 June – 14 June</strong></td>
                 <td><strong>40.6h</strong></td>
@@ -511,9 +535,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+2.6h</span></td>
                 <td><span class="text-red">2.6h</span></td>
-                <td class="earnings-col"><span class="text-red">$77.54/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$77.54/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$215</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$215</span></td>
             </tr><tr class="ot-row">
                 <td><strong>1 June – 7 June</strong></td>
                 <td><strong>42.8h</strong></td>
@@ -521,9 +545,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+4.8h</span></td>
                 <td><span class="text-red">4.8h</span></td>
-                <td class="earnings-col"><span class="text-red">$73.50/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$73.50/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$400</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$400</span></td>
             </tr><tr class="ot-row">
                 <td><strong>25 May – 31 May</strong></td>
                 <td><strong>42.5h</strong></td>
@@ -531,9 +555,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+4.5h</span></td>
                 <td><span class="text-red">4.5h</span></td>
-                <td class="earnings-col"><span class="text-red">$74.07/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.07/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$373</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$373</span></td>
             </tr><tr class="ot-row">
                 <td><strong>18 May – 24 May</strong></td>
                 <td><strong>41.3h</strong></td>
@@ -541,9 +565,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+3.3h</span></td>
                 <td><span class="text-red">3.3h</span></td>
-                <td class="earnings-col"><span class="text-red">$76.32/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$76.32/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$269</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$269</span></td>
             </tr><tr class="ot-row">
                 <td><strong>11 May – 17 May</strong></td>
                 <td><strong>42.0h</strong></td>
@@ -551,9 +575,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+4.0h</span></td>
                 <td><span class="text-red">4.0h</span></td>
-                <td class="earnings-col"><span class="text-red">$74.95/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.95/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$331</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$331</span></td>
             </tr><tr class="ot-row">
                 <td><strong>4 May – 10 May</strong></td>
                 <td><strong>42.3h</strong></td>
@@ -561,9 +585,9 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+4.3h</span></td>
                 <td><span class="text-red">4.3h</span></td>
-                <td class="earnings-col"><span class="text-red">$74.51/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$74.51/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$352</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$352</span></td>
             </tr><tr class="ot-row">
                 <td><strong>27 Apr – 3 May</strong></td>
                 <td><strong>45.5h</strong></td>
@@ -571,19 +595,19 @@
                 <td>38h</td>
                 <td><span class="badge badge-ot">+7.5h</span></td>
                 <td><span class="text-red">13.5h</span></td>
-                <td class="earnings-col"><span class="text-red">$61.13/h</span>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$61.13/h</span>
                     <span class="text-muted" style="font-size:0.75em">&nbsp;vs $82.84</span></td>
-                <td class="earnings-col"><span class="text-red">$1,118</span></td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$1,118</span></td>
             </tr></tbody><tfoot>
             <tr style="background:#f7f9fc;font-weight:700;border-top:2px solid #eee">
                 <td style="color:#555;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">All Time</td>
-                <td>964.6h</td>
-                <td><span class="text-red">17.5h</span></td>
+                <td>1027.7h</td>
+                <td><span class="text-red">21.5h</span></td>
                 <td>—</td>
-                <td><span class="badge badge-ot">64.0h OT</span></td>
-                <td><span class="text-red">81.5h</span></td>
-                <td class="earnings-col">—</td>
-                <td class="earnings-col"><span class="text-red">$6,750</span></td>
+                <td><span class="badge badge-ot">67.9h OT</span></td>
+                <td><span class="text-red">89.4h</span></td>
+                <td class="earnings-col" style="display: none;">—</td>
+                <td class="earnings-col" style="display: none;"><span class="text-red">$7,409</span></td>
             </tr>
         </tfoot></table></div>
     </div>
@@ -592,7 +616,7 @@
     <div class="panel">
         <div class="table-header">
             <h2>All Entries</h2>
-            <span id="entry-count">121 entries</span>
+            <span id="entry-count">130 entries</span>
         </div>
         <div id="entries-table"><table>
             <thead><tr>
@@ -603,6 +627,114 @@
                 <th>Week</th>
                 <th style="width:120px"></th>
             </tr></thead><tbody><tr>
+                <td>Mon, 19 Oct 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:15–16:30</span></td>
+                <td>9.75h</td>
+                <td class="text-muted" style="font-size:0.78em">19 Oct – 25 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('17924432442460mzjvplidtk')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('17924432442460mzjvplidtk')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr class="ot-row">
+                <td>Sat, 17 Oct 2026 <span class="badge badge-ot" style="font-size:0.68rem;padding:1px 6px">Weekend</span></td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">08:00–12:00</span></td>
+                <td>4h</td>
+                <td class="text-muted" style="font-size:0.78em">12 Oct – 18 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1792443244246ybjwbalxvs')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1792443244246ybjwbalxvs')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Fri, 16 Oct 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–15:00</span></td>
+                <td>8.5h</td>
+                <td class="text-muted" style="font-size:0.78em">12 Oct – 18 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1792123550712ozsgn5tjzgb')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1792123550712ozsgn5tjzgb')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Thu, 15 Oct 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">07:00–15:15</span></td>
+                <td>7.75h</td>
+                <td class="text-muted" style="font-size:0.78em">12 Oct – 18 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('17920265863658lbuyv97jmh')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('17920265863658lbuyv97jmh')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Wed, 14 Oct 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–16:30</span></td>
+                <td>10h</td>
+                <td class="text-muted" style="font-size:0.78em">12 Oct – 18 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1791954483946yav9jrw7ks')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1791954483946yav9jrw7ks')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Tue, 13 Oct 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">11:00–16:30</span></td>
+                <td>5h</td>
+                <td class="text-muted" style="font-size:0.78em">12 Oct – 18 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1791954483946nlvjcr96ggk')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1791954483946nlvjcr96ggk')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Mon, 12 Oct 2026</td>
+                <td>Sick Leave</td>
+                <td><span class="text-muted">—</span></td>
+                <td>7.6h</td>
+                <td class="text-muted" style="font-size:0.78em">12 Oct – 18 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('179195448394639rtmxmcvyd')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('179195448394639rtmxmcvyd')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Fri, 9 Oct 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:00–10:30</span></td>
+                <td>4.5h</td>
+                <td class="text-muted" style="font-size:0.78em">5 Oct – 11 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1791511681261edxly3axgv8')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1791511681261edxly3axgv8')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
+                <td>Thu, 8 Oct 2026</td>
+                <td>DCE</td>
+                <td><span style="font-size:0.82em;color:#555;white-space:nowrap">05:45–16:15</span></td>
+                <td>10h</td>
+                <td class="text-muted" style="font-size:0.78em">5 Oct – 11 Oct</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-secondary btn-sm" onclick="editEntry('1791485799302zuwv3g3ly3')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEntry('1791485799302zuwv3g3ly3')">Delete</button>
+                    </div>
+                </td>
+            </tr><tr>
                 <td>Wed, 7 Oct 2026</td>
                 <td>DCE</td>
                 <td><span style="font-size:0.82em;color:#555;white-space:nowrap">06:15–16:15</span></td>
@@ -2189,6 +2321,17 @@
       {"date":"2026-10-05","project":"Public Holiday","hours":7.6},
       {"date":"2026-10-06","project":"DCE","hours":9.5},   // 0600–1600, –30min lunch
       {"date":"2026-10-07","project":"DCE","hours":9.5},   // 0615–1615, –30min lunch
+      {"date":"2026-10-08","project":"DCE","hours":10.0},  // 0545–1615, –30min lunch
+      {"date":"2026-10-09","project":"DCE","hours":4.5},   // 0600–1030, no lunch deduction
+      // Week of 12 October 2026
+      {"date":"2026-10-12","project":"Sick Leave","hours":7.6},
+      {"date":"2026-10-13","project":"DCE","hours":5.0},   // 1100–1630, –30min lunch
+      {"date":"2026-10-14","project":"DCE","hours":10.0},  // 0600–1630, –30min lunch
+      {"date":"2026-10-15","project":"DCE","hours":7.75},  // 0700–1515, –30min lunch
+      {"date":"2026-10-16","project":"DCE","hours":8.5},   // 0600–1500, –30min lunch
+      // Week of 19 October 2026
+      {"date":"2026-10-17","project":"DCE","hours":4.0},   // 0800–1200, no lunch deduction
+      {"date":"2026-10-19","project":"DCE","hours":9.75},  // 0615–1630, –30min lunch
 
       // ⚠ 15 Jul 2026: end 1515 confirmed — START TIME UNKNOWN, hours not yet calculated
     ];
@@ -2274,6 +2417,14 @@
       {"date":"2026-10-02","project":"DCE","hours":9.0,   "startTime":"06:00","endTime":"15:30"},
       {"date":"2026-10-06","project":"DCE","hours":9.5,   "startTime":"06:00","endTime":"16:00"},
       {"date":"2026-10-07","project":"DCE","hours":9.5,   "startTime":"06:15","endTime":"16:15"},
+      {"date":"2026-10-08","project":"DCE","hours":10.0,  "startTime":"05:45","endTime":"16:15"},
+      {"date":"2026-10-09","project":"DCE","hours":4.5,   "startTime":"06:00","endTime":"10:30"},
+      {"date":"2026-10-13","project":"DCE","hours":5.0,   "startTime":"11:00","endTime":"16:30"},
+      {"date":"2026-10-14","project":"DCE","hours":10.0,  "startTime":"06:00","endTime":"16:30"},
+      {"date":"2026-10-15","project":"DCE","hours":7.75,  "startTime":"07:00","endTime":"15:15"},
+      {"date":"2026-10-16","project":"DCE","hours":8.5,   "startTime":"06:00","endTime":"15:00"},
+      {"date":"2026-10-17","project":"DCE","hours":4.0,   "startTime":"08:00","endTime":"12:00"},
+      {"date":"2026-10-19","project":"DCE","hours":9.75,  "startTime":"06:15","endTime":"16:30"},
     ];
 
     // ── TOIL (Time Off In Lieu) ─────────────────────────────────────────────────
